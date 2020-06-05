@@ -1,4 +1,4 @@
-.PHONY: all generate validate compile console
+.PHONY: all generate validate compile console dialyzer
 
 OutputDir ?= tmp
 
@@ -22,3 +22,6 @@ compile:
 
 console:
 	./rebar3 shell --apps=amoc_rest
+
+dialyzer:
+	./rebar3 dialyzer
