@@ -19,8 +19,7 @@ start(ID, #{
 } = Params) ->
     {Transport, TransportOpts} = get_socket_transport(IP, Port, NetOpts),
     LogicHandler = maps:get(logic_handler, Params, ?DEFAULT_LOGIC_HANDLER),
-    ExtraOpts = maps:get(cowboy_extra_opts, Params, []),
-    CowboyOpts = get_cowboy_config(LogicHandler, ExtraOpts),
+    CowboyOpts = get_default_opts(LogicHandler),
     case Transport of
         ssl ->
             cowboy:start_tls(ID, TransportOpts, CowboyOpts);
@@ -40,28 +39,14 @@ get_socket_transport(IP, Port, Options) ->
             {tcp, Opts}
     end.
 
-get_cowboy_config(LogicHandler, ExtraOpts) ->
-    get_cowboy_config(LogicHandler, ExtraOpts, get_default_opts(LogicHandler)).
-
-get_cowboy_config(_LogicHandler, [], Opts) ->
-    Opts;
-
-get_cowboy_config(LogicHandler, [{env, Env} | Rest], Opts) ->
-    NewEnv = case proplists:get_value(dispatch, Env) of
-        undefined -> [get_default_dispatch(LogicHandler) | Env];
-        _ -> Env
-    end,
-    get_cowboy_config(LogicHandler, Rest, store_key(env, NewEnv, Opts));
-
-get_cowboy_config(LogicHandler, [{Key, Value}| Rest], Opts) ->
-    get_cowboy_config(LogicHandler, Rest, store_key(Key, Value, Opts)).
-
 get_default_dispatch(LogicHandler) ->
-    Paths = amoc_rest_router:get_paths(LogicHandler),
+    [{'_', DefaultPaths}] = amoc_rest_router:get_paths(LogicHandler),
+    Paths = [{'_', [ %% adding static routing for swagger-ui
+        {"/api-docs", cowboy_static, {priv_file, amoc_rest, "swagger_ui/index.html"}},
+        {"/api-docs/[...]", cowboy_static, {priv_dir, amoc_rest, "swagger_ui"}},
+        {"/openapi.json", cowboy_static, {priv_file, amoc_rest, "openapi.json"}} |
+        DefaultPaths]}],
     #{dispatch => cowboy_router:compile(Paths)}.
 
 get_default_opts(LogicHandler) ->
     #{env => get_default_dispatch(LogicHandler)}.
-
-store_key(Key, Value, Opts) ->
-    lists:keystore(Key, 1, Opts, {Key, Value}).
