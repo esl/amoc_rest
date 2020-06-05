@@ -1,4 +1,4 @@
-.PHONY: all generate validate compile console dialyzer
+.PHONY: all generate validate compile console dialyzer xref
 
 OutputDir ?= tmp
 
@@ -25,3 +25,6 @@ console:
 
 dialyzer:
 	./rebar3 dialyzer
+
+xref:
+	./rebar3 xref
