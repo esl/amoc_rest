@@ -44,7 +44,6 @@ request_params('StatusGet') ->
 
 request_params('ScenariosUploadPut') ->
     [
-        'file'
     ];
 
 request_params(_) ->
@@ -102,19 +101,6 @@ request_param_info('ScenariosIdPatch', 'ScenarioExecution') ->
         rules => [
             schema,
             required
-        ]
-    };
-
-
-
-
-request_param_info('ScenariosUploadPut', 'file') ->
-    #{
-        source =>   body,
-        rules => [
-            {type, 'binary'},
-            schema,
-            not_required
         ]
     };
 
