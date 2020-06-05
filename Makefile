@@ -1,4 +1,4 @@
-.PHONY: all generate validate compile console dialyzer xref
+.PHONY: all test generate validate compile console dialyzer xref
 
 OutputDir ?= tmp
 
@@ -8,6 +8,9 @@ define openapi-generator
 endef
 
 all: compile
+
+test: validate compile dialyzer xref generate
+	diff -sq priv/openapi.json "$(OutputDir)/priv/openapi.json"
 
 generate:
 	$(openapi-generator) generate \

@@ -1,4 +1,5 @@
-# amoc_rest
+# amoc_rest [![Build Status](https://travis-ci.org/esl/amoc_rest.svg?branch=master)](https://travis-ci.org/esl/amoc_rest)
+
 The generated server code for AMOC REST API
 
 ## initial generation
