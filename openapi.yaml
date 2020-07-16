@@ -164,10 +164,7 @@ components:
             - finished
             - error
         settings:
-          ## using 'allOf' just to override the description
-          allOf:
-            - $ref: '#/components/schemas/ScenarioSettings'
-          description: execution or default parameters
+          $ref: '#/components/schemas/ScenarioSettings'
     ScenarioExecution:
       required:
         - users

@@ -222,7 +222,13 @@
       },
       "ScenarioStatus" : {
         "example" : {
-          "settings" : "",
+          "settings" : {
+            "atom_parameter" : "atom1",
+            "list_parameter" : "[atom1, atom2]",
+            "tuple_parameter" : "{atom1, atom2}",
+            "string_parameter" : "\"some_string\"",
+            "binary_parameter" : "<<\"some_binary\">>"
+          },
           "scenario_status" : "loaded"
         },
         "properties" : {
@@ -231,10 +237,18 @@
             "type" : "string"
           },
           "settings" : {
-            "allOf" : [ {
-              "$ref" : "#/components/schemas/ScenarioSettings"
-            } ],
-            "description" : "execution or default parameters"
+            "additionalProperties" : {
+              "type" : "string"
+            },
+            "description" : "Scenario parameters",
+            "example" : {
+              "atom_parameter" : "atom1",
+              "list_parameter" : "[atom1, atom2]",
+              "tuple_parameter" : "{atom1, atom2}",
+              "string_parameter" : "\"some_string\"",
+              "binary_parameter" : "<<\"some_binary\">>"
+            },
+            "type" : "object"
           }
         },
         "required" : [ "scenario_status" ],
