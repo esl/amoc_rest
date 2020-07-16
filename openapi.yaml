@@ -163,6 +163,11 @@ components:
             - running
             - finished
             - error
+        settings:
+          ## using 'allOf' just to override the description
+          allOf:
+            - $ref: '#/components/schemas/ScenarioSettings'
+          description: execution or default parameters
     ScenarioExecution:
       required:
         - users
@@ -173,16 +178,18 @@ components:
           description: Number of users to start
           example: 1000
         settings:
-          type: object
-          description: Scenario parameters
-          additionalProperties:
-            type: string
-          example:
-            atom_parameter: atom1
-            list_parameter: '[atom1, atom2]'
-            tuple_parameter: '{atom1, atom2}'
-            string_parameter: '"some_string"'
-            binary_parameter: <<"some_binary">>
+          $ref: '#/components/schemas/ScenarioSettings'
+    ScenarioSettings:
+      type: object
+      description: Scenario parameters
+      additionalProperties:
+        type: string
+      example:
+        atom_parameter: atom1
+        list_parameter: '[atom1, atom2]'
+        tuple_parameter: '{atom1, atom2}'
+        string_parameter: '"some_string"'
+        binary_parameter: <<"some_binary">>
     ScenarioExecutionResp:
       required:
         - scenario
