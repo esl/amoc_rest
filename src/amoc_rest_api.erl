@@ -25,6 +25,11 @@ request_params('ScenariosIdGet') ->
         'id'
     ];
 
+request_params('ScenariosIdInfoGet') ->
+    [
+        'id'
+    ];
+
 request_params('ScenariosIdPatch') ->
     [
         'id',
@@ -78,6 +83,15 @@ request_params(_) ->
 
 
 request_param_info('ScenariosIdGet', 'id') ->
+    #{
+        source =>  binding ,
+        rules => [
+            {type, 'binary'},
+            required
+        ]
+    };
+
+request_param_info('ScenariosIdInfoGet', 'id') ->
     #{
         source =>  binding ,
         rules => [
@@ -158,6 +172,11 @@ validate_response('NodesGet', 200, Body, ValidatorState) ->
 validate_response('ScenariosIdGet', 200, Body, ValidatorState) ->
     validate_response_body('ScenarioStatus', 'ScenarioStatus', Body, ValidatorState);
 validate_response('ScenariosIdGet', 404, Body, ValidatorState) ->
+    validate_response_body('', '', Body, ValidatorState);
+
+validate_response('ScenariosIdInfoGet', 200, Body, ValidatorState) ->
+    validate_response_body('ScenarioInfo', 'ScenarioInfo', Body, ValidatorState);
+validate_response('ScenariosIdInfoGet', 404, Body, ValidatorState) ->
     validate_response_body('', '', Body, ValidatorState);
 
 validate_response('ScenariosIdPatch', 200, Body, ValidatorState) ->

@@ -29,6 +29,27 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ScenarioList'
+  '/scenarios/{id}/info':
+    get:
+      tags:
+        - scenario
+      description: Get scenario status
+      parameters:
+        - name: id
+          in: path
+          description: Scenario name
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: response object
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ScenarioInfo'
+        '404':
+          description: no scenarion with such name
   '/scenarios/{id}':
     get:
       tags:
@@ -151,6 +172,40 @@ components:
           example:
             - some_scenario
             - another_scenario
+    ScenarioInfo:
+      required:
+        - edoc
+      type: object
+      properties:
+        edoc:
+          type: string
+      additionalProperties:
+        type: object
+        required:
+          - module
+          - description
+          - default_value
+          - verification_fn
+          - update_fn
+        properties:
+          module:
+            type: string
+          description:
+            type: string
+          default_value:
+            type: string
+          verification_fn:
+            type: string
+          update_fn:
+            type: string
+      example:
+        edoc: scenario description
+        configuration_parameter:
+          module: module_name
+          description: parameter description
+          default_value: default value
+          verification_fn: MFA or the list of the valid values
+          update_fn: MFA or readonly
     ScenarioStatus:
       required:
         - scenario_status

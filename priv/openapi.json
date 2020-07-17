@@ -44,6 +44,38 @@
         "tags" : [ "scenarios" ]
       }
     },
+    "/scenarios/{id}/info" : {
+      "get" : {
+        "description" : "Get scenario status",
+        "parameters" : [ {
+          "description" : "Scenario name",
+          "explode" : false,
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          },
+          "style" : "simple"
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ScenarioInfo"
+                }
+              }
+            },
+            "description" : "response object"
+          },
+          "404" : {
+            "description" : "no scenarion with such name"
+          }
+        },
+        "tags" : [ "scenario" ]
+      }
+    },
     "/scenarios/{id}" : {
       "get" : {
         "description" : "Get scenario status",
@@ -218,6 +250,46 @@
           }
         },
         "required" : [ "scenarios" ],
+        "type" : "object"
+      },
+      "ScenarioInfo" : {
+        "additionalProperties" : {
+          "properties" : {
+            "module" : {
+              "type" : "string"
+            },
+            "description" : {
+              "type" : "string"
+            },
+            "default_value" : {
+              "type" : "string"
+            },
+            "verification_fn" : {
+              "type" : "string"
+            },
+            "update_fn" : {
+              "type" : "string"
+            }
+          },
+          "required" : [ "default_value", "description", "module", "update_fn", "verification_fn" ],
+          "type" : "object"
+        },
+        "example" : {
+          "edoc" : "scenario description",
+          "configuration_parameter" : {
+            "module" : "module_name",
+            "description" : "parameter description",
+            "default_value" : "default value",
+            "verification_fn" : "MFA or the list of the valid values",
+            "update_fn" : "MFA or readonly"
+          }
+        },
+        "properties" : {
+          "edoc" : {
+            "type" : "string"
+          }
+        },
+        "required" : [ "edoc" ],
         "type" : "object"
       },
       "ScenarioStatus" : {
