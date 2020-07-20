@@ -70,7 +70,7 @@
             "description" : "response object"
           },
           "404" : {
-            "description" : "no scenarion with such name"
+            "description" : "no scenario with such a name"
           }
         },
         "tags" : [ "scenario" ]
@@ -102,7 +102,7 @@
             "description" : "response object"
           },
           "404" : {
-            "description" : "no scenarion with such name"
+            "description" : "no scenario with such a name"
           }
         },
         "tags" : [ "scenario" ]
@@ -143,7 +143,7 @@
             "description" : "response object"
           },
           "404" : {
-            "description" : "no scenarion with such name"
+            "description" : "no scenario with such a name"
           }
         },
         "tags" : [ "scenario" ]
@@ -253,43 +253,54 @@
         "type" : "object"
       },
       "ScenarioInfo" : {
-        "additionalProperties" : {
-          "properties" : {
-            "module" : {
-              "type" : "string"
-            },
-            "description" : {
-              "type" : "string"
-            },
-            "default_value" : {
-              "type" : "string"
-            },
-            "verification_fn" : {
-              "type" : "string"
-            },
-            "update_fn" : {
-              "type" : "string"
-            }
-          },
-          "required" : [ "default_value", "description", "module", "update_fn", "verification_fn" ],
-          "type" : "object"
-        },
         "example" : {
-          "edoc" : "scenario description",
-          "configuration_parameter" : {
-            "module" : "module_name",
-            "description" : "parameter description",
-            "default_value" : "default value",
-            "verification_fn" : "MFA or the list of the valid values",
-            "update_fn" : "MFA or readonly"
+          "doc" : "scenario description",
+          "parameters" : {
+            "configuration_parameter_name1" : {
+              "module" : "module_name",
+              "description" : "parameter description",
+              "default_value" : "default value",
+              "verification_fn" : "MFA, 'none' or the list of valid values",
+              "update_fn" : "MFA, 'none' or 'readonly'"
+            },
+            "configuration_parameter_name2" : {
+              "module" : "module_name",
+              "description" : "parameter description",
+              "default_value" : "default value",
+              "verification_fn" : "MFA, 'none' or the list of valid values",
+              "update_fn" : "MFA, 'none' or 'readonly'"
+            }
           }
         },
         "properties" : {
-          "edoc" : {
+          "doc" : {
+            "example" : "scenario description",
             "type" : "string"
+          },
+          "parameters" : {
+            "additionalProperties" : {
+              "$ref" : "#/components/schemas/ScenarioInfo_parameters"
+            },
+            "example" : {
+              "configuration_parameter_name1" : {
+                "module" : "module_name",
+                "description" : "parameter description",
+                "default_value" : "default value",
+                "verification_fn" : "MFA, 'none' or the list of valid values",
+                "update_fn" : "MFA, 'none' or 'readonly'"
+              },
+              "configuration_parameter_name2" : {
+                "module" : "module_name",
+                "description" : "parameter description",
+                "default_value" : "default value",
+                "verification_fn" : "MFA, 'none' or the list of valid values",
+                "update_fn" : "MFA, 'none' or 'readonly'"
+              }
+            },
+            "type" : "object"
           }
         },
-        "required" : [ "edoc" ],
+        "required" : [ "doc" ],
         "type" : "object"
       },
       "ScenarioStatus" : {
@@ -428,6 +439,26 @@
         },
         "required" : [ "error" ],
         "type" : "object"
+      },
+      "ScenarioInfo_parameters" : {
+        "properties" : {
+          "module" : {
+            "type" : "string"
+          },
+          "description" : {
+            "type" : "string"
+          },
+          "default_value" : {
+            "type" : "string"
+          },
+          "verification_fn" : {
+            "type" : "string"
+          },
+          "update_fn" : {
+            "type" : "string"
+          }
+        },
+        "required" : [ "default_value", "description", "module", "update_fn", "verification_fn" ]
       }
     }
   }

@@ -49,7 +49,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ScenarioInfo'
         '404':
-          description: no scenarion with such name
+          description: no scenario with such a name
   '/scenarios/{id}':
     get:
       tags:
@@ -70,7 +70,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ScenarioStatus'
         '404':
-          description: no scenarion with such name
+          description: no scenario with such a name
     patch:
       tags:
         - scenario
@@ -97,7 +97,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ScenarioExecutionResp'
         '404':
-          description: no scenarion with such name
+          description: no scenario with such a name
   /status:
     get:
       tags:
@@ -174,38 +174,46 @@ components:
             - another_scenario
     ScenarioInfo:
       required:
-        - edoc
+        - doc
       type: object
       properties:
-        edoc:
+        doc:
           type: string
-      additionalProperties:
-        type: object
-        required:
-          - module
-          - description
-          - default_value
-          - verification_fn
-          - update_fn
-        properties:
-          module:
-            type: string
-          description:
-            type: string
-          default_value:
-            type: string
-          verification_fn:
-            type: string
-          update_fn:
-            type: string
-      example:
-        edoc: scenario description
-        configuration_parameter:
-          module: module_name
-          description: parameter description
-          default_value: default value
-          verification_fn: MFA or the list of the valid values
-          update_fn: MFA or readonly
+          example: scenario description
+        parameters:
+          type: object
+          additionalProperties:
+            type: object
+            required:
+              - module
+              - description
+              - default_value
+              - verification_fn
+              - update_fn
+            properties:
+              module:
+                type: string
+              description:
+                type: string
+              default_value:
+                type: string
+              verification_fn:
+                type: string
+              update_fn:
+                type: string
+          example:
+            configuration_parameter_name1:
+              module: module_name
+              description: parameter description
+              default_value: default value
+              verification_fn: 'MFA, ''none'' or the list of valid values'
+              update_fn: 'MFA, ''none'' or ''readonly'''
+            configuration_parameter_name2:
+              module: module_name
+              description: parameter description
+              default_value: default value
+              verification_fn: 'MFA, ''none'' or the list of valid values'
+              update_fn: 'MFA, ''none'' or ''readonly'''
     ScenarioStatus:
       required:
         - scenario_status
