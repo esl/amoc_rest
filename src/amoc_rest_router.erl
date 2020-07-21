@@ -65,6 +65,11 @@ get_operations() ->
             method => <<"GET">>,
             handler => 'amoc_rest_scenario_handler'
         },
+        'ScenariosIdInfoGet' => #{
+            path => "/scenarios/:id/info",
+            method => <<"GET">>,
+            handler => 'amoc_rest_scenario_handler'
+        },
         'ScenariosIdPatch' => #{
             path => "/scenarios/:id",
             method => <<"PATCH">>,

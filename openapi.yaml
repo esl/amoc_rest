@@ -29,6 +29,27 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ScenarioList'
+  '/scenarios/{id}/info':
+    get:
+      tags:
+        - scenario
+      description: Get scenario status
+      parameters:
+        - name: id
+          in: path
+          description: Scenario name
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: response object
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ScenarioInfo'
+        '404':
+          description: no scenario with such a name
   '/scenarios/{id}':
     get:
       tags:
@@ -49,7 +70,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ScenarioStatus'
         '404':
-          description: no scenarion with such name
+          description: no scenario with such a name
     patch:
       tags:
         - scenario
@@ -76,7 +97,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ScenarioExecutionResp'
         '404':
-          description: no scenarion with such name
+          description: no scenario with such a name
   /status:
     get:
       tags:
@@ -151,6 +172,48 @@ components:
           example:
             - some_scenario
             - another_scenario
+    ScenarioInfo:
+      required:
+        - doc
+      type: object
+      properties:
+        doc:
+          type: string
+          example: scenario description
+        parameters:
+          type: object
+          additionalProperties:
+            type: object
+            required:
+              - module
+              - description
+              - default_value
+              - verification_fn
+              - update_fn
+            properties:
+              module:
+                type: string
+              description:
+                type: string
+              default_value:
+                type: string
+              verification_fn:
+                type: string
+              update_fn:
+                type: string
+          example:
+            configuration_parameter_name1:
+              module: module_name
+              description: parameter description
+              default_value: default value
+              verification_fn: 'MFA, ''none'' or the list of valid values'
+              update_fn: 'MFA, ''none'' or ''readonly'''
+            configuration_parameter_name2:
+              module: module_name
+              description: parameter description
+              default_value: default value
+              verification_fn: 'MFA, ''none'' or the list of valid values'
+              update_fn: 'MFA, ''none'' or ''readonly'''
     ScenarioStatus:
       required:
         - scenario_status
@@ -163,6 +226,8 @@ components:
             - running
             - finished
             - error
+        settings:
+          $ref: '#/components/schemas/ScenarioSettings'
     ScenarioExecution:
       required:
         - users
@@ -173,16 +238,18 @@ components:
           description: Number of users to start
           example: 1000
         settings:
-          type: object
-          description: Scenario parameters
-          additionalProperties:
-            type: string
-          example:
-            atom_parameter: atom1
-            list_parameter: '[atom1, atom2]'
-            tuple_parameter: '{atom1, atom2}'
-            string_parameter: '"some_string"'
-            binary_parameter: <<"some_binary">>
+          $ref: '#/components/schemas/ScenarioSettings'
+    ScenarioSettings:
+      type: object
+      description: Scenario parameters
+      additionalProperties:
+        type: string
+      example:
+        atom_parameter: atom1
+        list_parameter: '[atom1, atom2]'
+        tuple_parameter: '{atom1, atom2}'
+        string_parameter: '"some_string"'
+        binary_parameter: <<"some_binary">>
     ScenarioExecutionResp:
       required:
         - scenario
