@@ -80,35 +80,35 @@ get_operations() ->
             method => <<"PATCH">>,
             handler => 'amoc_rest_execution_handler'
         },
-        'NodesGet' => #{
-            path => "/nodes",
-            method => <<"GET">>,
-            handler => 'amoc_rest_node_handler'
-        },
-        'ScenariosIdGet' => #{
-            path => "/scenarios/:id",
-            method => <<"GET">>,
-            handler => 'amoc_rest_scenario_handler'
-        },
-        'ScenariosIdInfoGet' => #{
-            path => "/scenarios/:id/info",
-            method => <<"GET">>,
-            handler => 'amoc_rest_scenario_handler'
-        },
         'ScenariosGet' => #{
             path => "/scenarios",
             method => <<"GET">>,
             handler => 'amoc_rest_scenarios_handler'
         },
-        'StatusGet' => #{
-            path => "/status",
+        'ScenariosIdGet' => #{
+            path => "/scenarios/:id",
             method => <<"GET">>,
-            handler => 'amoc_rest_status_handler'
+            handler => 'amoc_rest_scenarios_handler'
+        },
+        'ScenariosIdInfoGet' => #{
+            path => "/scenarios/:id/info",
+            method => <<"GET">>,
+            handler => 'amoc_rest_scenarios_handler'
         },
         'ScenariosUploadPut' => #{
             path => "/scenarios/upload",
             method => <<"PUT">>,
-            handler => 'amoc_rest_upload_handler'
+            handler => 'amoc_rest_scenarios_handler'
+        },
+        'NodesGet' => #{
+            path => "/nodes",
+            method => <<"GET">>,
+            handler => 'amoc_rest_status_handler'
+        },
+        'StatusGet' => #{
+            path => "/status",
+            method => <<"GET">>,
+            handler => 'amoc_rest_status_handler'
         }
     }.
 

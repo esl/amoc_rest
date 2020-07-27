@@ -40,10 +40,9 @@ request_params('ExecutionUpdateSettingsPatch') ->
     ];
 
 
-request_params('NodesGet') ->
+request_params('ScenariosGet') ->
     [
     ];
-
 
 request_params('ScenariosIdGet') ->
     [
@@ -55,18 +54,16 @@ request_params('ScenariosIdInfoGet') ->
         'id'
     ];
 
-
-request_params('ScenariosGet') ->
+request_params('ScenariosUploadPut') ->
     [
     ];
 
+
+request_params('NodesGet') ->
+    [
+    ];
 
 request_params('StatusGet') ->
-    [
-    ];
-
-
-request_params('ScenariosUploadPut') ->
     [
     ];
 
@@ -135,7 +132,6 @@ request_param_info('ExecutionUpdateSettingsPatch', 'ExecutionUpdateSettings') ->
             required
         ]
     };
-
 
 
 request_param_info('ScenariosIdGet', 'id') ->
@@ -240,9 +236,8 @@ validate_response('ExecutionUpdateSettingsPatch', 500, Body, ValidatorState) ->
     validate_response_body('Error', 'Error', Body, ValidatorState);
 
 
-validate_response('NodesGet', 200, Body, ValidatorState) ->
-    validate_response_body('NodesKV', 'NodesKV', Body, ValidatorState);
-
+validate_response('ScenariosGet', 200, Body, ValidatorState) ->
+    validate_response_body('ScenarioList', 'ScenarioList', Body, ValidatorState);
 
 validate_response('ScenariosIdGet', 200, Body, ValidatorState) ->
     validate_response_body('ScenarioStatus', 'ScenarioStatus', Body, ValidatorState);
@@ -254,19 +249,17 @@ validate_response('ScenariosIdInfoGet', 200, Body, ValidatorState) ->
 validate_response('ScenariosIdInfoGet', 404, Body, ValidatorState) ->
     validate_response_body('', '', Body, ValidatorState);
 
-
-validate_response('ScenariosGet', 200, Body, ValidatorState) ->
-    validate_response_body('ScenarioList', 'ScenarioList', Body, ValidatorState);
-
-
-validate_response('StatusGet', 200, Body, ValidatorState) ->
-    validate_response_body('AmocStatus', 'AmocStatus', Body, ValidatorState);
-
-
 validate_response('ScenariosUploadPut', 200, Body, ValidatorState) ->
     validate_response_body('UploadResp', 'UploadResp', Body, ValidatorState);
 validate_response('ScenariosUploadPut', 400, Body, ValidatorState) ->
     validate_response_body('Error', 'Error', Body, ValidatorState);
+
+
+validate_response('NodesGet', 200, Body, ValidatorState) ->
+    validate_response_body('NodesKV', 'NodesKV', Body, ValidatorState);
+
+validate_response('StatusGet', 200, Body, ValidatorState) ->
+    validate_response_body('AmocStatus', 'AmocStatus', Body, ValidatorState);
 
 
 validate_response(_OperationID, _Code, _Body, _ValidatorState) ->

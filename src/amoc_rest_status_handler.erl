@@ -49,6 +49,14 @@ init(Req, {Operations, LogicHandler, ValidatorState}) ->
 allowed_methods(
     Req,
     State = #state{
+        operation_id = 'NodesGet'
+    }
+) ->
+    {[<<"GET">>], Req, State};
+
+allowed_methods(
+    Req,
+    State = #state{
         operation_id = 'StatusGet'
     }
 ) ->
@@ -80,6 +88,16 @@ content_types_accepted(Req, State) ->
 
 -spec valid_content_headers(Req :: cowboy_req:req(), State :: state()) ->
     {Value :: boolean(), Req :: cowboy_req:req(), State :: state()}.
+
+valid_content_headers(
+    Req0,
+    State = #state{
+        operation_id = 'NodesGet'
+    }
+) ->
+    Headers = [],
+    {Result, Req} = validate_headers(Headers, Req0),
+    {Result, Req, State};
 
 valid_content_headers(
     Req0,

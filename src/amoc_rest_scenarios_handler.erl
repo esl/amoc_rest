@@ -54,6 +54,30 @@ allowed_methods(
 ) ->
     {[<<"GET">>], Req, State};
 
+allowed_methods(
+    Req,
+    State = #state{
+        operation_id = 'ScenariosIdGet'
+    }
+) ->
+    {[<<"GET">>], Req, State};
+
+allowed_methods(
+    Req,
+    State = #state{
+        operation_id = 'ScenariosIdInfoGet'
+    }
+) ->
+    {[<<"GET">>], Req, State};
+
+allowed_methods(
+    Req,
+    State = #state{
+        operation_id = 'ScenariosUploadPut'
+    }
+) ->
+    {[<<"PUT">>], Req, State};
+
 allowed_methods(Req, State) ->
     {[], Req, State}.
 
@@ -75,7 +99,8 @@ is_authorized(Req, State) ->
 
 content_types_accepted(Req, State) ->
     {[
-        {<<"application/json">>, handle_request_json}
+        {<<"application/octet-stream">>, handle_request_json},
+        {<<"text/plain">>, handle_request_json}
     ], Req, State}.
 
 -spec valid_content_headers(Req :: cowboy_req:req(), State :: state()) ->
@@ -85,6 +110,36 @@ valid_content_headers(
     Req0,
     State = #state{
         operation_id = 'ScenariosGet'
+    }
+) ->
+    Headers = [],
+    {Result, Req} = validate_headers(Headers, Req0),
+    {Result, Req, State};
+
+valid_content_headers(
+    Req0,
+    State = #state{
+        operation_id = 'ScenariosIdGet'
+    }
+) ->
+    Headers = [],
+    {Result, Req} = validate_headers(Headers, Req0),
+    {Result, Req, State};
+
+valid_content_headers(
+    Req0,
+    State = #state{
+        operation_id = 'ScenariosIdInfoGet'
+    }
+) ->
+    Headers = [],
+    {Result, Req} = validate_headers(Headers, Req0),
+    {Result, Req, State};
+
+valid_content_headers(
+    Req0,
+    State = #state{
+        operation_id = 'ScenariosUploadPut'
     }
 ) ->
     Headers = [],

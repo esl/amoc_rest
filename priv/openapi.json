@@ -23,7 +23,7 @@
             "description" : "response object"
           }
         },
-        "tags" : [ "node" ]
+        "tags" : [ "status" ]
       }
     },
     "/scenarios" : {
@@ -73,7 +73,7 @@
             "description" : "no scenario with such a name"
           }
         },
-        "tags" : [ "scenario" ]
+        "tags" : [ "scenarios" ]
       }
     },
     "/scenarios/{id}" : {
@@ -105,7 +105,7 @@
             "description" : "no scenario with such a name"
           }
         },
-        "tags" : [ "scenario" ]
+        "tags" : [ "scenarios" ]
       }
     },
     "/status" : {
@@ -166,7 +166,7 @@
             "description" : "response object"
           }
         },
-        "tags" : [ "upload" ]
+        "tags" : [ "scenarios" ]
       }
     },
     "/execution/start" : {
@@ -570,8 +570,7 @@
           "nodes" : {
             "example" : [ "amoc@host1", "amoc@host2" ],
             "items" : {
-              "pattern" : "^[^@]+@[^@]+$",
-              "type" : "string"
+              "$ref" : "#/components/schemas/Node"
             },
             "type" : "array"
           }
@@ -608,8 +607,7 @@
           "nodes" : {
             "example" : [ "amoc@host1", "amoc@host2" ],
             "items" : {
-              "pattern" : "^[^@]+@[^@]+$",
-              "type" : "string"
+              "$ref" : "#/components/schemas/Node"
             },
             "type" : "array"
           }
@@ -620,10 +618,13 @@
       "NodeList" : {
         "example" : [ "amoc@host1", "amoc@host2" ],
         "items" : {
-          "pattern" : "^[^@]+@[^@]+$",
-          "type" : "string"
+          "$ref" : "#/components/schemas/Node"
         },
         "type" : "array"
+      },
+      "Node" : {
+        "pattern" : "^[^@]+@[^@]+$",
+        "type" : "string"
       },
       "ScenarioInfo_parameters" : {
         "properties" : {
