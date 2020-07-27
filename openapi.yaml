@@ -71,33 +71,6 @@ paths:
                 $ref: '#/components/schemas/ScenarioStatus'
         '404':
           description: no scenario with such a name
-    patch:
-      tags:
-        - scenario
-      description: Start scenario
-      parameters:
-        - name: id
-          in: path
-          description: Scenario name
-          required: true
-          schema:
-            type: string
-      requestBody:
-        description: request body (as json)
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ScenarioExecution'
-        required: true
-      responses:
-        '200':
-          description: response object
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ScenarioExecutionResp'
-        '404':
-          description: no scenario with such a name
   /status:
     get:
       tags:
@@ -139,6 +112,116 @@ paths:
                 $ref: '#/components/schemas/UploadResp'
         '400':
           description: response object
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /execution/start:
+    patch:
+      tags:
+        - execution
+      description: Start scenario
+      requestBody:
+        description: request body (as json)
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExecutionStart'
+        required: true
+      responses:
+        '200':
+          description: execution started succesfully
+        '409':
+          description: >-
+            execution cannot be started (e.g. another scenario is already
+            running)
+        '500':
+          description: internal error occured
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /execution/stop:
+    patch:
+      tags:
+        - execution
+      description: Stop scenario
+      responses:
+        '200':
+          description: execution stopped succesfully
+        '409':
+          description: scenario is not running
+        '500':
+          description: internal error occured
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /execution/add_users:
+    patch:
+      tags:
+        - execution
+      description: add new users
+      requestBody:
+        description: request body (as json)
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExecutionChangeUsers'
+        required: true
+      responses:
+        '200':
+          description: users added successfully
+        '409':
+          description: scenario is not running
+        '500':
+          description: internal error occured
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /execution/remove_users:
+    patch:
+      tags:
+        - execution
+      description: stop users
+      requestBody:
+        description: request body (as json)
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExecutionChangeUsers'
+        required: true
+      responses:
+        '200':
+          description: users removed successfully
+        '409':
+          description: scenario is not running
+        '500':
+          description: internal error occured
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /execution/update_settings:
+    patch:
+      tags:
+        - execution
+      description: update scenario settings
+      requestBody:
+        description: request body (as json)
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExecutionUpdateSettings'
+        required: true
+      responses:
+        '200':
+          description: Settings updated successfully
+        '409':
+          description: scenario is not running
+        '500':
+          description: internal error occured
           content:
             application/json:
               schema:
@@ -228,17 +311,6 @@ components:
             - error
         settings:
           $ref: '#/components/schemas/ScenarioSettings'
-    ScenarioExecution:
-      required:
-        - users
-      type: object
-      properties:
-        users:
-          type: integer
-          description: Number of users to start
-          example: 1000
-        settings:
-          $ref: '#/components/schemas/ScenarioSettings'
     ScenarioSettings:
       type: object
       description: Scenario parameters
@@ -250,16 +322,6 @@ components:
         tuple_parameter: '{atom1, atom2}'
         string_parameter: '"some_string"'
         binary_parameter: <<"some_binary">>
-    ScenarioExecutionResp:
-      required:
-        - scenario
-      type: object
-      properties:
-        scenario:
-          type: string
-          enum:
-            - started
-            - error
     AmocStatus:
       required:
         - node_status
@@ -290,3 +352,46 @@ components:
         error:
           type: string
           example: error description
+    ExecutionStart:
+      required:
+        - scenario
+      type: object
+      properties:
+        scenario:
+          type: string
+          description: scenario name
+          example: some_scenario
+        users:
+          type: integer
+          description: Number of users to start
+          example: 1000
+        settings:
+          $ref: '#/components/schemas/ScenarioSettings'
+    ExecutionChangeUsers:
+      required:
+        - users
+      type: object
+      properties:
+        users:
+          type: integer
+          description: Number of users
+          example: 1000
+        nodes:
+          $ref: '#/components/schemas/NodeList'
+    ExecutionUpdateSettings:
+      required:
+        - settings
+      type: object
+      properties:
+        settings:
+          $ref: '#/components/schemas/ScenarioSettings'
+        nodes:
+          $ref: '#/components/schemas/NodeList'
+    NodeList:
+      type: array
+      items:
+        type: string
+        pattern: ^[^@]+@[^@]+$
+      example:
+        - amoc@host1
+        - amoc@host2

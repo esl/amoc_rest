@@ -106,47 +106,6 @@
           }
         },
         "tags" : [ "scenario" ]
-      },
-      "patch" : {
-        "description" : "Start scenario",
-        "parameters" : [ {
-          "description" : "Scenario name",
-          "explode" : false,
-          "in" : "path",
-          "name" : "id",
-          "required" : true,
-          "schema" : {
-            "type" : "string"
-          },
-          "style" : "simple"
-        } ],
-        "requestBody" : {
-          "content" : {
-            "application/json" : {
-              "schema" : {
-                "$ref" : "#/components/schemas/ScenarioExecution"
-              }
-            }
-          },
-          "description" : "request body (as json)",
-          "required" : true
-        },
-        "responses" : {
-          "200" : {
-            "content" : {
-              "application/json" : {
-                "schema" : {
-                  "$ref" : "#/components/schemas/ScenarioExecutionResp"
-                }
-              }
-            },
-            "description" : "response object"
-          },
-          "404" : {
-            "description" : "no scenario with such a name"
-          }
-        },
-        "tags" : [ "scenario" ]
       }
     },
     "/status" : {
@@ -208,6 +167,170 @@
           }
         },
         "tags" : [ "upload" ]
+      }
+    },
+    "/execution/start" : {
+      "patch" : {
+        "description" : "Start scenario",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/ExecutionStart"
+              }
+            }
+          },
+          "description" : "request body (as json)",
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "execution started succesfully"
+          },
+          "409" : {
+            "description" : "execution cannot be started (e.g. another scenario is already running)"
+          },
+          "500" : {
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Error"
+                }
+              }
+            },
+            "description" : "internal error occured"
+          }
+        },
+        "tags" : [ "execution" ]
+      }
+    },
+    "/execution/stop" : {
+      "patch" : {
+        "description" : "Stop scenario",
+        "responses" : {
+          "200" : {
+            "description" : "execution stopped succesfully"
+          },
+          "409" : {
+            "description" : "scenario is not running"
+          },
+          "500" : {
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Error"
+                }
+              }
+            },
+            "description" : "internal error occured"
+          }
+        },
+        "tags" : [ "execution" ]
+      }
+    },
+    "/execution/add_users" : {
+      "patch" : {
+        "description" : "add new users",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/ExecutionChangeUsers"
+              }
+            }
+          },
+          "description" : "request body (as json)",
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "users added successfully"
+          },
+          "409" : {
+            "description" : "scenario is not running"
+          },
+          "500" : {
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Error"
+                }
+              }
+            },
+            "description" : "internal error occured"
+          }
+        },
+        "tags" : [ "execution" ]
+      }
+    },
+    "/execution/remove_users" : {
+      "patch" : {
+        "description" : "stop users",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/ExecutionChangeUsers"
+              }
+            }
+          },
+          "description" : "request body (as json)",
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "users removed successfully"
+          },
+          "409" : {
+            "description" : "scenario is not running"
+          },
+          "500" : {
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Error"
+                }
+              }
+            },
+            "description" : "internal error occured"
+          }
+        },
+        "tags" : [ "execution" ]
+      }
+    },
+    "/execution/update_settings" : {
+      "patch" : {
+        "description" : "update scenario settings",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/ExecutionUpdateSettings"
+              }
+            }
+          },
+          "description" : "request body (as json)",
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "Settings updated successfully"
+          },
+          "409" : {
+            "description" : "scenario is not running"
+          },
+          "500" : {
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Error"
+                }
+              }
+            },
+            "description" : "internal error occured"
+          }
+        },
+        "tags" : [ "execution" ]
       }
     }
   },
@@ -337,41 +460,6 @@
         "required" : [ "scenario_status" ],
         "type" : "object"
       },
-      "ScenarioExecution" : {
-        "example" : {
-          "settings" : {
-            "atom_parameter" : "atom1",
-            "list_parameter" : "[atom1, atom2]",
-            "tuple_parameter" : "{atom1, atom2}",
-            "string_parameter" : "\"some_string\"",
-            "binary_parameter" : "<<\"some_binary\">>"
-          },
-          "users" : 1000
-        },
-        "properties" : {
-          "users" : {
-            "description" : "Number of users to start",
-            "example" : 1000,
-            "type" : "integer"
-          },
-          "settings" : {
-            "additionalProperties" : {
-              "type" : "string"
-            },
-            "description" : "Scenario parameters",
-            "example" : {
-              "atom_parameter" : "atom1",
-              "list_parameter" : "[atom1, atom2]",
-              "tuple_parameter" : "{atom1, atom2}",
-              "string_parameter" : "\"some_string\"",
-              "binary_parameter" : "<<\"some_binary\">>"
-            },
-            "type" : "object"
-          }
-        },
-        "required" : [ "users" ],
-        "type" : "object"
-      },
       "ScenarioSettings" : {
         "additionalProperties" : {
           "type" : "string"
@@ -384,19 +472,6 @@
           "string_parameter" : "\"some_string\"",
           "binary_parameter" : "<<\"some_binary\">>"
         },
-        "type" : "object"
-      },
-      "ScenarioExecutionResp" : {
-        "example" : {
-          "scenario" : "started"
-        },
-        "properties" : {
-          "scenario" : {
-            "enum" : [ "started", "error" ],
-            "type" : "string"
-          }
-        },
-        "required" : [ "scenario" ],
         "type" : "object"
       },
       "AmocStatus" : {
@@ -439,6 +514,116 @@
         },
         "required" : [ "error" ],
         "type" : "object"
+      },
+      "ExecutionStart" : {
+        "example" : {
+          "settings" : {
+            "atom_parameter" : "atom1",
+            "list_parameter" : "[atom1, atom2]",
+            "tuple_parameter" : "{atom1, atom2}",
+            "string_parameter" : "\"some_string\"",
+            "binary_parameter" : "<<\"some_binary\">>"
+          },
+          "scenario" : "some_scenario",
+          "users" : 1000
+        },
+        "properties" : {
+          "scenario" : {
+            "description" : "scenario name",
+            "example" : "some_scenario",
+            "type" : "string"
+          },
+          "users" : {
+            "description" : "Number of users to start",
+            "example" : 1000,
+            "type" : "integer"
+          },
+          "settings" : {
+            "additionalProperties" : {
+              "type" : "string"
+            },
+            "description" : "Scenario parameters",
+            "example" : {
+              "atom_parameter" : "atom1",
+              "list_parameter" : "[atom1, atom2]",
+              "tuple_parameter" : "{atom1, atom2}",
+              "string_parameter" : "\"some_string\"",
+              "binary_parameter" : "<<\"some_binary\">>"
+            },
+            "type" : "object"
+          }
+        },
+        "required" : [ "scenario" ],
+        "type" : "object"
+      },
+      "ExecutionChangeUsers" : {
+        "example" : {
+          "nodes" : [ "amoc@host1", "amoc@host2" ],
+          "users" : 1000
+        },
+        "properties" : {
+          "users" : {
+            "description" : "Number of users",
+            "example" : 1000,
+            "type" : "integer"
+          },
+          "nodes" : {
+            "example" : [ "amoc@host1", "amoc@host2" ],
+            "items" : {
+              "pattern" : "^[^@]+@[^@]+$",
+              "type" : "string"
+            },
+            "type" : "array"
+          }
+        },
+        "required" : [ "users" ],
+        "type" : "object"
+      },
+      "ExecutionUpdateSettings" : {
+        "example" : {
+          "settings" : {
+            "atom_parameter" : "atom1",
+            "list_parameter" : "[atom1, atom2]",
+            "tuple_parameter" : "{atom1, atom2}",
+            "string_parameter" : "\"some_string\"",
+            "binary_parameter" : "<<\"some_binary\">>"
+          },
+          "nodes" : [ "amoc@host1", "amoc@host2" ]
+        },
+        "properties" : {
+          "settings" : {
+            "additionalProperties" : {
+              "type" : "string"
+            },
+            "description" : "Scenario parameters",
+            "example" : {
+              "atom_parameter" : "atom1",
+              "list_parameter" : "[atom1, atom2]",
+              "tuple_parameter" : "{atom1, atom2}",
+              "string_parameter" : "\"some_string\"",
+              "binary_parameter" : "<<\"some_binary\">>"
+            },
+            "type" : "object"
+          },
+          "nodes" : {
+            "example" : [ "amoc@host1", "amoc@host2" ],
+            "items" : {
+              "pattern" : "^[^@]+@[^@]+$",
+              "type" : "string"
+            },
+            "type" : "array"
+          }
+        },
+        "required" : [ "settings" ],
+        "type" : "object"
+      },
+      "NodeList" : {
+        "example" : [ "amoc@host1", "amoc@host2" ],
+        "items" : {
+          "pattern" : "^[^@]+@[^@]+$",
+          "type" : "string"
+        },
+        "type" : "array"
       },
       "ScenarioInfo_parameters" : {
         "properties" : {

@@ -55,6 +55,31 @@ group_paths() ->
 
 get_operations() ->
     #{ 
+        'ExecutionAddUsersPatch' => #{
+            path => "/execution/add_users",
+            method => <<"PATCH">>,
+            handler => 'amoc_rest_execution_handler'
+        },
+        'ExecutionRemoveUsersPatch' => #{
+            path => "/execution/remove_users",
+            method => <<"PATCH">>,
+            handler => 'amoc_rest_execution_handler'
+        },
+        'ExecutionStartPatch' => #{
+            path => "/execution/start",
+            method => <<"PATCH">>,
+            handler => 'amoc_rest_execution_handler'
+        },
+        'ExecutionStopPatch' => #{
+            path => "/execution/stop",
+            method => <<"PATCH">>,
+            handler => 'amoc_rest_execution_handler'
+        },
+        'ExecutionUpdateSettingsPatch' => #{
+            path => "/execution/update_settings",
+            method => <<"PATCH">>,
+            handler => 'amoc_rest_execution_handler'
+        },
         'NodesGet' => #{
             path => "/nodes",
             method => <<"GET">>,
@@ -68,11 +93,6 @@ get_operations() ->
         'ScenariosIdInfoGet' => #{
             path => "/scenarios/:id/info",
             method => <<"GET">>,
-            handler => 'amoc_rest_scenario_handler'
-        },
-        'ScenariosIdPatch' => #{
-            path => "/scenarios/:id",
-            method => <<"PATCH">>,
             handler => 'amoc_rest_scenario_handler'
         },
         'ScenariosGet' => #{

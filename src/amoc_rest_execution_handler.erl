@@ -1,5 +1,5 @@
 %% basic handler
--module(amoc_rest_scenario_handler).
+-module(amoc_rest_execution_handler).
 
 %% Cowboy REST callbacks
 -export([allowed_methods/2]).
@@ -49,18 +49,42 @@ init(Req, {Operations, LogicHandler, ValidatorState}) ->
 allowed_methods(
     Req,
     State = #state{
-        operation_id = 'ScenariosIdGet'
+        operation_id = 'ExecutionAddUsersPatch'
     }
 ) ->
-    {[<<"GET">>], Req, State};
+    {[<<"PATCH">>], Req, State};
 
 allowed_methods(
     Req,
     State = #state{
-        operation_id = 'ScenariosIdInfoGet'
+        operation_id = 'ExecutionRemoveUsersPatch'
     }
 ) ->
-    {[<<"GET">>], Req, State};
+    {[<<"PATCH">>], Req, State};
+
+allowed_methods(
+    Req,
+    State = #state{
+        operation_id = 'ExecutionStartPatch'
+    }
+) ->
+    {[<<"PATCH">>], Req, State};
+
+allowed_methods(
+    Req,
+    State = #state{
+        operation_id = 'ExecutionStopPatch'
+    }
+) ->
+    {[<<"PATCH">>], Req, State};
+
+allowed_methods(
+    Req,
+    State = #state{
+        operation_id = 'ExecutionUpdateSettingsPatch'
+    }
+) ->
+    {[<<"PATCH">>], Req, State};
 
 allowed_methods(Req, State) ->
     {[], Req, State}.
@@ -92,7 +116,7 @@ content_types_accepted(Req, State) ->
 valid_content_headers(
     Req0,
     State = #state{
-        operation_id = 'ScenariosIdGet'
+        operation_id = 'ExecutionAddUsersPatch'
     }
 ) ->
     Headers = [],
@@ -102,7 +126,37 @@ valid_content_headers(
 valid_content_headers(
     Req0,
     State = #state{
-        operation_id = 'ScenariosIdInfoGet'
+        operation_id = 'ExecutionRemoveUsersPatch'
+    }
+) ->
+    Headers = [],
+    {Result, Req} = validate_headers(Headers, Req0),
+    {Result, Req, State};
+
+valid_content_headers(
+    Req0,
+    State = #state{
+        operation_id = 'ExecutionStartPatch'
+    }
+) ->
+    Headers = [],
+    {Result, Req} = validate_headers(Headers, Req0),
+    {Result, Req, State};
+
+valid_content_headers(
+    Req0,
+    State = #state{
+        operation_id = 'ExecutionStopPatch'
+    }
+) ->
+    Headers = [],
+    {Result, Req} = validate_headers(Headers, Req0),
+    {Result, Req, State};
+
+valid_content_headers(
+    Req0,
+    State = #state{
+        operation_id = 'ExecutionUpdateSettingsPatch'
     }
 ) ->
     Headers = [],
