@@ -55,40 +55,60 @@ group_paths() ->
 
 get_operations() ->
     #{ 
-        'NodesGet' => #{
-            path => "/nodes",
-            method => <<"GET">>,
-            handler => 'amoc_rest_node_handler'
-        },
-        'ScenariosIdGet' => #{
-            path => "/scenarios/:id",
-            method => <<"GET">>,
-            handler => 'amoc_rest_scenario_handler'
-        },
-        'ScenariosIdInfoGet' => #{
-            path => "/scenarios/:id/info",
-            method => <<"GET">>,
-            handler => 'amoc_rest_scenario_handler'
-        },
-        'ScenariosIdPatch' => #{
-            path => "/scenarios/:id",
+        'ExecutionAddUsersPatch' => #{
+            path => "/execution/add_users",
             method => <<"PATCH">>,
-            handler => 'amoc_rest_scenario_handler'
+            handler => 'amoc_rest_execution_handler'
+        },
+        'ExecutionRemoveUsersPatch' => #{
+            path => "/execution/remove_users",
+            method => <<"PATCH">>,
+            handler => 'amoc_rest_execution_handler'
+        },
+        'ExecutionStartPatch' => #{
+            path => "/execution/start",
+            method => <<"PATCH">>,
+            handler => 'amoc_rest_execution_handler'
+        },
+        'ExecutionStopPatch' => #{
+            path => "/execution/stop",
+            method => <<"PATCH">>,
+            handler => 'amoc_rest_execution_handler'
+        },
+        'ExecutionUpdateSettingsPatch' => #{
+            path => "/execution/update_settings",
+            method => <<"PATCH">>,
+            handler => 'amoc_rest_execution_handler'
         },
         'ScenariosGet' => #{
             path => "/scenarios",
             method => <<"GET">>,
             handler => 'amoc_rest_scenarios_handler'
         },
-        'StatusGet' => #{
-            path => "/status",
+        'ScenariosIdGet' => #{
+            path => "/scenarios/:id",
             method => <<"GET">>,
-            handler => 'amoc_rest_status_handler'
+            handler => 'amoc_rest_scenarios_handler'
+        },
+        'ScenariosIdInfoGet' => #{
+            path => "/scenarios/:id/info",
+            method => <<"GET">>,
+            handler => 'amoc_rest_scenarios_handler'
         },
         'ScenariosUploadPut' => #{
             path => "/scenarios/upload",
             method => <<"PUT">>,
-            handler => 'amoc_rest_upload_handler'
+            handler => 'amoc_rest_scenarios_handler'
+        },
+        'NodesGet' => #{
+            path => "/nodes",
+            method => <<"GET">>,
+            handler => 'amoc_rest_status_handler'
+        },
+        'StatusGet' => #{
+            path => "/status",
+            method => <<"GET">>,
+            handler => 'amoc_rest_status_handler'
         }
     }.
 

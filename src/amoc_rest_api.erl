@@ -15,10 +15,34 @@
 -spec request_params(OperationID :: operation_id()) -> [Param :: request_param()].
 
 
-request_params('NodesGet') ->
+request_params('ExecutionAddUsersPatch') ->
+    [
+        'ExecutionChangeUsers'
+    ];
+
+request_params('ExecutionRemoveUsersPatch') ->
+    [
+        'ExecutionChangeUsers'
+    ];
+
+request_params('ExecutionStartPatch') ->
+    [
+        'ExecutionStart'
+    ];
+
+request_params('ExecutionStopPatch') ->
     [
     ];
 
+request_params('ExecutionUpdateSettingsPatch') ->
+    [
+        'ExecutionUpdateSettings'
+    ];
+
+
+request_params('ScenariosGet') ->
+    [
+    ];
 
 request_params('ScenariosIdGet') ->
     [
@@ -30,24 +54,16 @@ request_params('ScenariosIdInfoGet') ->
         'id'
     ];
 
-request_params('ScenariosIdPatch') ->
-    [
-        'id',
-        'ScenarioExecution'
-    ];
-
-
-request_params('ScenariosGet') ->
+request_params('ScenariosUploadPut') ->
     [
     ];
 
+
+request_params('NodesGet') ->
+    [
+    ];
 
 request_params('StatusGet') ->
-    [
-    ];
-
-
-request_params('ScenariosUploadPut') ->
     [
     ];
 
@@ -81,6 +97,42 @@ request_params(_) ->
 
 
 
+request_param_info('ExecutionAddUsersPatch', 'ExecutionChangeUsers') ->
+    #{
+        source =>   body,
+        rules => [
+            schema,
+            required
+        ]
+    };
+
+request_param_info('ExecutionRemoveUsersPatch', 'ExecutionChangeUsers') ->
+    #{
+        source =>   body,
+        rules => [
+            schema,
+            required
+        ]
+    };
+
+request_param_info('ExecutionStartPatch', 'ExecutionStart') ->
+    #{
+        source =>   body,
+        rules => [
+            schema,
+            required
+        ]
+    };
+
+request_param_info('ExecutionUpdateSettingsPatch', 'ExecutionUpdateSettings') ->
+    #{
+        source =>   body,
+        rules => [
+            schema,
+            required
+        ]
+    };
+
 
 request_param_info('ScenariosIdGet', 'id') ->
     #{
@@ -100,23 +152,6 @@ request_param_info('ScenariosIdInfoGet', 'id') ->
         ]
     };
 
-request_param_info('ScenariosIdPatch', 'id') ->
-    #{
-        source =>  binding ,
-        rules => [
-            {type, 'binary'},
-            required
-        ]
-    };
-
-request_param_info('ScenariosIdPatch', 'ScenarioExecution') ->
-    #{
-        source =>   body,
-        rules => [
-            schema,
-            required
-        ]
-    };
 
 request_param_info(OperationID, Name) ->
     error({unknown_param, OperationID, Name}).
@@ -165,9 +200,44 @@ populate_request_param(OperationID, Name, Req0, ValidatorState) ->
 ) -> ok | no_return().
 
 
-validate_response('NodesGet', 200, Body, ValidatorState) ->
-    validate_response_body('NodesKV', 'NodesKV', Body, ValidatorState);
+validate_response('ExecutionAddUsersPatch', 200, Body, ValidatorState) ->
+    validate_response_body('', '', Body, ValidatorState);
+validate_response('ExecutionAddUsersPatch', 409, Body, ValidatorState) ->
+    validate_response_body('', '', Body, ValidatorState);
+validate_response('ExecutionAddUsersPatch', 500, Body, ValidatorState) ->
+    validate_response_body('Error', 'Error', Body, ValidatorState);
 
+validate_response('ExecutionRemoveUsersPatch', 200, Body, ValidatorState) ->
+    validate_response_body('', '', Body, ValidatorState);
+validate_response('ExecutionRemoveUsersPatch', 409, Body, ValidatorState) ->
+    validate_response_body('', '', Body, ValidatorState);
+validate_response('ExecutionRemoveUsersPatch', 500, Body, ValidatorState) ->
+    validate_response_body('Error', 'Error', Body, ValidatorState);
+
+validate_response('ExecutionStartPatch', 200, Body, ValidatorState) ->
+    validate_response_body('', '', Body, ValidatorState);
+validate_response('ExecutionStartPatch', 409, Body, ValidatorState) ->
+    validate_response_body('', '', Body, ValidatorState);
+validate_response('ExecutionStartPatch', 500, Body, ValidatorState) ->
+    validate_response_body('Error', 'Error', Body, ValidatorState);
+
+validate_response('ExecutionStopPatch', 200, Body, ValidatorState) ->
+    validate_response_body('', '', Body, ValidatorState);
+validate_response('ExecutionStopPatch', 409, Body, ValidatorState) ->
+    validate_response_body('', '', Body, ValidatorState);
+validate_response('ExecutionStopPatch', 500, Body, ValidatorState) ->
+    validate_response_body('Error', 'Error', Body, ValidatorState);
+
+validate_response('ExecutionUpdateSettingsPatch', 200, Body, ValidatorState) ->
+    validate_response_body('', '', Body, ValidatorState);
+validate_response('ExecutionUpdateSettingsPatch', 409, Body, ValidatorState) ->
+    validate_response_body('', '', Body, ValidatorState);
+validate_response('ExecutionUpdateSettingsPatch', 500, Body, ValidatorState) ->
+    validate_response_body('Error', 'Error', Body, ValidatorState);
+
+
+validate_response('ScenariosGet', 200, Body, ValidatorState) ->
+    validate_response_body('ScenarioList', 'ScenarioList', Body, ValidatorState);
 
 validate_response('ScenariosIdGet', 200, Body, ValidatorState) ->
     validate_response_body('ScenarioStatus', 'ScenarioStatus', Body, ValidatorState);
@@ -179,24 +249,17 @@ validate_response('ScenariosIdInfoGet', 200, Body, ValidatorState) ->
 validate_response('ScenariosIdInfoGet', 404, Body, ValidatorState) ->
     validate_response_body('', '', Body, ValidatorState);
 
-validate_response('ScenariosIdPatch', 200, Body, ValidatorState) ->
-    validate_response_body('ScenarioExecutionResp', 'ScenarioExecutionResp', Body, ValidatorState);
-validate_response('ScenariosIdPatch', 404, Body, ValidatorState) ->
-    validate_response_body('', '', Body, ValidatorState);
-
-
-validate_response('ScenariosGet', 200, Body, ValidatorState) ->
-    validate_response_body('ScenarioList', 'ScenarioList', Body, ValidatorState);
-
-
-validate_response('StatusGet', 200, Body, ValidatorState) ->
-    validate_response_body('AmocStatus', 'AmocStatus', Body, ValidatorState);
-
-
 validate_response('ScenariosUploadPut', 200, Body, ValidatorState) ->
     validate_response_body('UploadResp', 'UploadResp', Body, ValidatorState);
 validate_response('ScenariosUploadPut', 400, Body, ValidatorState) ->
     validate_response_body('Error', 'Error', Body, ValidatorState);
+
+
+validate_response('NodesGet', 200, Body, ValidatorState) ->
+    validate_response_body('NodesKV', 'NodesKV', Body, ValidatorState);
+
+validate_response('StatusGet', 200, Body, ValidatorState) ->
+    validate_response_body('AmocStatus', 'AmocStatus', Body, ValidatorState);
 
 
 validate_response(_OperationID, _Code, _Body, _ValidatorState) ->
