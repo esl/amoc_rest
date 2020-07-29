@@ -130,13 +130,13 @@ paths:
         required: true
       responses:
         '200':
-          description: execution started succesfully
+          description: execution started successfully
         '409':
           description: >-
             execution cannot be started (e.g. another scenario is already
             running)
         '500':
-          description: internal error occured
+          description: internal error occurred
           content:
             application/json:
               schema:
@@ -148,11 +148,11 @@ paths:
       description: Stop scenario
       responses:
         '200':
-          description: execution stopped succesfully
+          description: execution stopped successfully
         '409':
           description: scenario is not running
         '500':
-          description: internal error occured
+          description: internal error occurred
           content:
             application/json:
               schema:
@@ -175,7 +175,7 @@ paths:
         '409':
           description: scenario is not running
         '500':
-          description: internal error occured
+          description: internal error occurred
           content:
             application/json:
               schema:
@@ -198,7 +198,7 @@ paths:
         '409':
           description: scenario is not running
         '500':
-          description: internal error occured
+          description: internal error occurred
           content:
             application/json:
               schema:
@@ -221,7 +221,7 @@ paths:
         '409':
           description: scenario is not running
         '500':
-          description: internal error occured
+          description: internal error occurred
           content:
             application/json:
               schema:

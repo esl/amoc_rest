@@ -185,7 +185,7 @@
         },
         "responses" : {
           "200" : {
-            "description" : "execution started succesfully"
+            "description" : "execution started successfully"
           },
           "409" : {
             "description" : "execution cannot be started (e.g. another scenario is already running)"
@@ -198,7 +198,7 @@
                 }
               }
             },
-            "description" : "internal error occured"
+            "description" : "internal error occurred"
           }
         },
         "tags" : [ "execution" ]
@@ -209,7 +209,7 @@
         "description" : "Stop scenario",
         "responses" : {
           "200" : {
-            "description" : "execution stopped succesfully"
+            "description" : "execution stopped successfully"
           },
           "409" : {
             "description" : "scenario is not running"
@@ -222,7 +222,7 @@
                 }
               }
             },
-            "description" : "internal error occured"
+            "description" : "internal error occurred"
           }
         },
         "tags" : [ "execution" ]
@@ -257,7 +257,7 @@
                 }
               }
             },
-            "description" : "internal error occured"
+            "description" : "internal error occurred"
           }
         },
         "tags" : [ "execution" ]
@@ -292,7 +292,7 @@
                 }
               }
             },
-            "description" : "internal error occured"
+            "description" : "internal error occurred"
           }
         },
         "tags" : [ "execution" ]
@@ -327,7 +327,7 @@
                 }
               }
             },
-            "description" : "internal error occured"
+            "description" : "internal error occurred"
           }
         },
         "tags" : [ "execution" ]
