@@ -107,6 +107,7 @@ is_authorized(Req, State) ->
 
 content_types_accepted(Req, State) ->
     {[
+        {undefined, handle_request_json},
         {<<"application/json">>, handle_request_json}
     ], Req, State}.
 
