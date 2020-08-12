@@ -33,7 +33,7 @@ paths:
     get:
       tags:
         - scenarios
-      description: Get scenario status
+      description: Get scenario description
       parameters:
         - name: id
           in: path
@@ -54,7 +54,7 @@ paths:
     get:
       tags:
         - scenarios
-      description: Get scenario status
+      description: Get scenario default settings
       parameters:
         - name: id
           in: path
@@ -87,11 +87,11 @@ paths:
     get:
       tags:
         - status
-      description: Get AMOC app status
+      description: Get AMOC app status on a remote node
       parameters:
         - name: node
           in: path
-          description: Scenario name
+          description: Node name
           required: true
           schema:
             $ref: '#/components/schemas/Node'

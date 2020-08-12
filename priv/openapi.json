@@ -46,7 +46,7 @@
     },
     "/scenarios/info/{id}" : {
       "get" : {
-        "description" : "Get scenario status",
+        "description" : "Get scenario description",
         "parameters" : [ {
           "description" : "Scenario name",
           "explode" : false,
@@ -78,7 +78,7 @@
     },
     "/scenarios/defaults/{id}" : {
       "get" : {
-        "description" : "Get scenario status",
+        "description" : "Get scenario default settings",
         "parameters" : [ {
           "description" : "Scenario name",
           "explode" : false,
@@ -128,9 +128,9 @@
     },
     "/status/{node}" : {
       "get" : {
-        "description" : "Get AMOC app status",
+        "description" : "Get AMOC app status on a remote node",
         "parameters" : [ {
-          "description" : "Scenario name",
+          "description" : "Node name",
           "explode" : false,
           "in" : "path",
           "name" : "node",
