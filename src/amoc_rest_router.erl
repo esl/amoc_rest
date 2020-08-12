@@ -80,18 +80,18 @@ get_operations() ->
             method => <<"PATCH">>,
             handler => 'amoc_rest_execution_handler'
         },
+        'ScenariosDefaultsIdGet' => #{
+            path => "/scenarios/defaults/:id",
+            method => <<"GET">>,
+            handler => 'amoc_rest_scenarios_handler'
+        },
         'ScenariosGet' => #{
             path => "/scenarios",
             method => <<"GET">>,
             handler => 'amoc_rest_scenarios_handler'
         },
-        'ScenariosIdGet' => #{
-            path => "/scenarios/:id",
-            method => <<"GET">>,
-            handler => 'amoc_rest_scenarios_handler'
-        },
-        'ScenariosIdInfoGet' => #{
-            path => "/scenarios/:id/info",
+        'ScenariosInfoIdGet' => #{
+            path => "/scenarios/info/:id",
             method => <<"GET">>,
             handler => 'amoc_rest_scenarios_handler'
         },
@@ -107,6 +107,11 @@ get_operations() ->
         },
         'StatusGet' => #{
             path => "/status",
+            method => <<"GET">>,
+            handler => 'amoc_rest_status_handler'
+        },
+        'StatusNodeGet' => #{
+            path => "/status/:node",
             method => <<"GET">>,
             handler => 'amoc_rest_status_handler'
         }

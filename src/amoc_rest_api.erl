@@ -40,16 +40,16 @@ request_params('ExecutionUpdateSettingsPatch') ->
     ];
 
 
-request_params('ScenariosGet') ->
-    [
-    ];
-
-request_params('ScenariosIdGet') ->
+request_params('ScenariosDefaultsIdGet') ->
     [
         'id'
     ];
 
-request_params('ScenariosIdInfoGet') ->
+request_params('ScenariosGet') ->
+    [
+    ];
+
+request_params('ScenariosInfoIdGet') ->
     [
         'id'
     ];
@@ -65,6 +65,11 @@ request_params('NodesGet') ->
 
 request_params('StatusGet') ->
     [
+    ];
+
+request_params('StatusNodeGet') ->
+    [
+        'node'
     ];
 
 request_params(_) ->
@@ -134,7 +139,7 @@ request_param_info('ExecutionUpdateSettingsPatch', 'ExecutionUpdateSettings') ->
     };
 
 
-request_param_info('ScenariosIdGet', 'id') ->
+request_param_info('ScenariosDefaultsIdGet', 'id') ->
     #{
         source =>  binding ,
         rules => [
@@ -143,7 +148,7 @@ request_param_info('ScenariosIdGet', 'id') ->
         ]
     };
 
-request_param_info('ScenariosIdInfoGet', 'id') ->
+request_param_info('ScenariosInfoIdGet', 'id') ->
     #{
         source =>  binding ,
         rules => [
@@ -152,6 +157,15 @@ request_param_info('ScenariosIdInfoGet', 'id') ->
         ]
     };
 
+
+request_param_info('StatusNodeGet', 'node') ->
+    #{
+        source =>  binding ,
+        rules => [
+            {type, 'binary'},
+            required
+        ]
+    };
 
 request_param_info(OperationID, Name) ->
     error({unknown_param, OperationID, Name}).
@@ -236,17 +250,17 @@ validate_response('ExecutionUpdateSettingsPatch', 500, Body, ValidatorState) ->
     validate_response_body('Error', 'Error', Body, ValidatorState);
 
 
+validate_response('ScenariosDefaultsIdGet', 200, Body, ValidatorState) ->
+    validate_response_body('ScenarioDefaults', 'ScenarioDefaults', Body, ValidatorState);
+validate_response('ScenariosDefaultsIdGet', 404, Body, ValidatorState) ->
+    validate_response_body('', '', Body, ValidatorState);
+
 validate_response('ScenariosGet', 200, Body, ValidatorState) ->
     validate_response_body('ScenarioList', 'ScenarioList', Body, ValidatorState);
 
-validate_response('ScenariosIdGet', 200, Body, ValidatorState) ->
-    validate_response_body('ScenarioStatus', 'ScenarioStatus', Body, ValidatorState);
-validate_response('ScenariosIdGet', 404, Body, ValidatorState) ->
-    validate_response_body('', '', Body, ValidatorState);
-
-validate_response('ScenariosIdInfoGet', 200, Body, ValidatorState) ->
+validate_response('ScenariosInfoIdGet', 200, Body, ValidatorState) ->
     validate_response_body('ScenarioInfo', 'ScenarioInfo', Body, ValidatorState);
-validate_response('ScenariosIdInfoGet', 404, Body, ValidatorState) ->
+validate_response('ScenariosInfoIdGet', 404, Body, ValidatorState) ->
     validate_response_body('', '', Body, ValidatorState);
 
 validate_response('ScenariosUploadPut', 200, Body, ValidatorState) ->
@@ -260,6 +274,11 @@ validate_response('NodesGet', 200, Body, ValidatorState) ->
 
 validate_response('StatusGet', 200, Body, ValidatorState) ->
     validate_response_body('AmocStatus', 'AmocStatus', Body, ValidatorState);
+
+validate_response('StatusNodeGet', 200, Body, ValidatorState) ->
+    validate_response_body('AmocStatus', 'AmocStatus', Body, ValidatorState);
+validate_response('StatusNodeGet', 404, Body, ValidatorState) ->
+    validate_response_body('', '', Body, ValidatorState);
 
 
 validate_response(_OperationID, _Code, _Body, _ValidatorState) ->

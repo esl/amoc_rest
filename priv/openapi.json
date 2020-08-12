@@ -44,7 +44,7 @@
         "tags" : [ "scenarios" ]
       }
     },
-    "/scenarios/{id}/info" : {
+    "/scenarios/info/{id}" : {
       "get" : {
         "description" : "Get scenario status",
         "parameters" : [ {
@@ -76,7 +76,7 @@
         "tags" : [ "scenarios" ]
       }
     },
-    "/scenarios/{id}" : {
+    "/scenarios/defaults/{id}" : {
       "get" : {
         "description" : "Get scenario status",
         "parameters" : [ {
@@ -95,7 +95,7 @@
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/ScenarioStatus"
+                  "$ref" : "#/components/schemas/ScenarioDefaults"
                 }
               }
             },
@@ -110,7 +110,7 @@
     },
     "/status" : {
       "get" : {
-        "description" : "Get AMOC app status, whether it is running or not.",
+        "description" : "Get AMOC app status",
         "responses" : {
           "200" : {
             "content" : {
@@ -121,6 +121,38 @@
               }
             },
             "description" : "response object"
+          }
+        },
+        "tags" : [ "status" ]
+      }
+    },
+    "/status/{node}" : {
+      "get" : {
+        "description" : "Get AMOC app status",
+        "parameters" : [ {
+          "description" : "Scenario name",
+          "explode" : false,
+          "in" : "path",
+          "name" : "node",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          },
+          "style" : "simple"
+        } ],
+        "responses" : {
+          "200" : {
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/AmocStatus"
+                }
+              }
+            },
+            "description" : "response object"
+          },
+          "404" : {
+            "description" : "no node with such a name"
           }
         },
         "tags" : [ "status" ]
@@ -426,7 +458,7 @@
         "required" : [ "doc" ],
         "type" : "object"
       },
-      "ScenarioStatus" : {
+      "ScenarioDefaults" : {
         "example" : {
           "settings" : {
             "atom_parameter" : "atom1",
@@ -434,14 +466,9 @@
             "tuple_parameter" : "{atom1, atom2}",
             "string_parameter" : "\"some_string\"",
             "binary_parameter" : "<<\"some_binary\">>"
-          },
-          "scenario_status" : "loaded"
+          }
         },
         "properties" : {
-          "scenario_status" : {
-            "enum" : [ "loaded", "running", "finished", "error" ],
-            "type" : "string"
-          },
           "settings" : {
             "additionalProperties" : {
               "type" : "string"
@@ -457,7 +484,7 @@
             "type" : "object"
           }
         },
-        "required" : [ "scenario_status" ],
+        "required" : [ "settings" ],
         "type" : "object"
       },
       "ScenarioSettings" : {
@@ -475,16 +502,91 @@
         "type" : "object"
       },
       "AmocStatus" : {
+        "description" : "\"controller\" field is mandatory if \"amoc_status\" is \"up\".\n",
         "example" : {
-          "node_status" : "up"
+          "controller" : {
+            "status" : "running",
+            "scenario" : "some_scenario",
+            "number_of_users" : 10,
+            "settings" : {
+              "atom_parameter" : "atom1",
+              "list_parameter" : "[atom1, atom2]",
+              "tuple_parameter" : "{atom1, atom2}",
+              "string_parameter" : "\"some_string\"",
+              "binary_parameter" : "<<\"some_binary\">>"
+            }
+          },
+          "amoc_status" : "up",
+          "env" : {
+            "AMOC_INTERARRIVAL" : "50"
+          }
         },
         "properties" : {
-          "node_status" : {
+          "amoc_status" : {
             "enum" : [ "up", "down" ],
+            "type" : "string"
+          },
+          "env" : {
+            "additionalProperties" : {
+              "type" : "string"
+            },
+            "description" : "environment variables",
+            "example" : {
+              "AMOC_INTERARRIVAL" : "50"
+            },
+            "type" : "object"
+          },
+          "controller" : {
+            "$ref" : "#/components/schemas/ControllerStatus"
+          }
+        },
+        "required" : [ "amoc_status", "env" ],
+        "type" : "object"
+      },
+      "ControllerStatus" : {
+        "description" : "controller is \"disabled\" on the master node.\n\n\"scenario\" and \"settings\" fields are included if \"status\" is \"running\", \"terminating\" or \"finished\"\n\n\"number_of_users\" field is relevant only when controller is in \"running\" state.\n\n\"error\" field is relevant only when controller is in \"error\" state.\n",
+        "example" : {
+          "status" : "running",
+          "scenario" : "some_scenario",
+          "number_of_users" : 10,
+          "settings" : {
+            "atom_parameter" : "atom1",
+            "list_parameter" : "[atom1, atom2]",
+            "tuple_parameter" : "{atom1, atom2}",
+            "string_parameter" : "\"some_string\"",
+            "binary_parameter" : "<<\"some_binary\">>"
+          }
+        },
+        "properties" : {
+          "status" : {
+            "enum" : [ "idle", "running", "terminating", "finished", "error", "disabled" ],
+            "type" : "string"
+          },
+          "scenario" : {
+            "type" : "string"
+          },
+          "number_of_users" : {
+            "type" : "integer"
+          },
+          "settings" : {
+            "additionalProperties" : {
+              "type" : "string"
+            },
+            "description" : "Scenario parameters",
+            "example" : {
+              "atom_parameter" : "atom1",
+              "list_parameter" : "[atom1, atom2]",
+              "tuple_parameter" : "{atom1, atom2}",
+              "string_parameter" : "\"some_string\"",
+              "binary_parameter" : "<<\"some_binary\">>"
+            },
+            "type" : "object"
+          },
+          "error" : {
             "type" : "string"
           }
         },
-        "required" : [ "node_status" ],
+        "required" : [ "status" ],
         "type" : "object"
       },
       "UploadBody" : {
