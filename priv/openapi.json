@@ -136,7 +136,7 @@
           "name" : "node",
           "required" : true,
           "schema" : {
-            "type" : "string"
+            "$ref" : "#/components/schemas/Node"
           },
           "style" : "simple"
         } ],

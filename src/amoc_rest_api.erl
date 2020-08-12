@@ -163,6 +163,7 @@ request_param_info('StatusNodeGet', 'node') ->
         source =>  binding ,
         rules => [
             {type, 'binary'},
+            {pattern, "^[^@]+@[^@]+$" },
             required
         ]
     };
