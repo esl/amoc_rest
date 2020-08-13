@@ -62,6 +62,14 @@ allowed_methods(
 ) ->
     {[<<"GET">>], Req, State};
 
+allowed_methods(
+    Req,
+    State = #state{
+        operation_id = 'StatusNodeGet'
+    }
+) ->
+    {[<<"GET">>], Req, State};
+
 allowed_methods(Req, State) ->
     {[], Req, State}.
 
@@ -103,6 +111,16 @@ valid_content_headers(
     Req0,
     State = #state{
         operation_id = 'StatusGet'
+    }
+) ->
+    Headers = [],
+    {Result, Req} = validate_headers(Headers, Req0),
+    {Result, Req, State};
+
+valid_content_headers(
+    Req0,
+    State = #state{
+        operation_id = 'StatusNodeGet'
     }
 ) ->
     Headers = [],

@@ -49,6 +49,14 @@ init(Req, {Operations, LogicHandler, ValidatorState}) ->
 allowed_methods(
     Req,
     State = #state{
+        operation_id = 'ScenariosDefaultsIdGet'
+    }
+) ->
+    {[<<"GET">>], Req, State};
+
+allowed_methods(
+    Req,
+    State = #state{
         operation_id = 'ScenariosGet'
     }
 ) ->
@@ -57,15 +65,7 @@ allowed_methods(
 allowed_methods(
     Req,
     State = #state{
-        operation_id = 'ScenariosIdGet'
-    }
-) ->
-    {[<<"GET">>], Req, State};
-
-allowed_methods(
-    Req,
-    State = #state{
-        operation_id = 'ScenariosIdInfoGet'
+        operation_id = 'ScenariosInfoIdGet'
     }
 ) ->
     {[<<"GET">>], Req, State};
@@ -109,6 +109,16 @@ content_types_accepted(Req, State) ->
 valid_content_headers(
     Req0,
     State = #state{
+        operation_id = 'ScenariosDefaultsIdGet'
+    }
+) ->
+    Headers = [],
+    {Result, Req} = validate_headers(Headers, Req0),
+    {Result, Req, State};
+
+valid_content_headers(
+    Req0,
+    State = #state{
         operation_id = 'ScenariosGet'
     }
 ) ->
@@ -119,17 +129,7 @@ valid_content_headers(
 valid_content_headers(
     Req0,
     State = #state{
-        operation_id = 'ScenariosIdGet'
-    }
-) ->
-    Headers = [],
-    {Result, Req} = validate_headers(Headers, Req0),
-    {Result, Req, State};
-
-valid_content_headers(
-    Req0,
-    State = #state{
-        operation_id = 'ScenariosIdInfoGet'
+        operation_id = 'ScenariosInfoIdGet'
     }
 ) ->
     Headers = [],

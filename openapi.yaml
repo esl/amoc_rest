@@ -29,11 +29,11 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ScenarioList'
-  '/scenarios/{id}/info':
+  '/scenarios/info/{id}':
     get:
       tags:
         - scenarios
-      description: Get scenario status
+      description: Get scenario description
       parameters:
         - name: id
           in: path
@@ -50,11 +50,11 @@ paths:
                 $ref: '#/components/schemas/ScenarioInfo'
         '404':
           description: no scenario with such a name
-  '/scenarios/{id}':
+  '/scenarios/defaults/{id}':
     get:
       tags:
         - scenarios
-      description: Get scenario status
+      description: Get scenario default settings
       parameters:
         - name: id
           in: path
@@ -68,14 +68,14 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ScenarioStatus'
+                $ref: '#/components/schemas/ScenarioDefaults'
         '404':
           description: no scenario with such a name
   /status:
     get:
       tags:
         - status
-      description: 'Get AMOC app status, whether it is running or not.'
+      description: Get AMOC app status
       responses:
         '200':
           description: response object
@@ -83,6 +83,27 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AmocStatus'
+  '/status/{node}':
+    get:
+      tags:
+        - status
+      description: Get AMOC app status on a remote node
+      parameters:
+        - name: node
+          in: path
+          description: Node name
+          required: true
+          schema:
+            $ref: '#/components/schemas/Node'
+      responses:
+        '200':
+          description: response object
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AmocStatus'
+        '404':
+          description: no node with such a name
   /scenarios/upload:
     put:
       tags:
@@ -297,18 +318,11 @@ components:
               default_value: default value
               verification_fn: 'MFA, ''none'' or the list of valid values'
               update_fn: 'MFA, ''none'' or ''readonly'''
-    ScenarioStatus:
+    ScenarioDefaults:
       required:
-        - scenario_status
+        - settings
       type: object
       properties:
-        scenario_status:
-          type: string
-          enum:
-            - loaded
-            - running
-            - finished
-            - error
         settings:
           $ref: '#/components/schemas/ScenarioSettings'
     ScenarioSettings:
@@ -324,14 +338,71 @@ components:
         binary_parameter: <<"some_binary">>
     AmocStatus:
       required:
-        - node_status
+        - amoc_status
+        - env
       type: object
+      description: |
+        "controller" field is mandatory if "amoc_status" is "up".
       properties:
-        node_status:
+        amoc_status:
           type: string
           enum:
             - up
             - down
+        env:
+          type: object
+          description: environment variables
+          additionalProperties:
+            type: string
+          example:
+            AMOC_INTERARRIVAL: '50'
+        controller:
+          $ref: '#/components/schemas/ControllerStatus'
+    ControllerStatus:
+      type: object
+      description: >
+        controller is "disabled" on the master node.
+
+
+        "scenario" and "settings" fields are included if "status" is "running",
+        "terminating" or "finished"
+
+
+        "number_of_users" field is relevant only when controller is in "running"
+        state.
+
+
+        "error" field is relevant only when controller is in "error" state.
+      required:
+        - status
+      properties:
+        status:
+          type: string
+          enum:
+            - idle
+            - running
+            - terminating
+            - finished
+            - error
+            - disabled
+        scenario:
+          type: string
+        number_of_users:
+          type: integer
+        settings:
+          $ref: '#/components/schemas/ScenarioSettings'
+        error:
+          type: string
+      example:
+        status: running
+        scenario: some_scenario
+        number_of_users: 10
+        settings:
+          atom_parameter: atom1
+          list_parameter: '[atom1, atom2]'
+          tuple_parameter: '{atom1, atom2}'
+          string_parameter: '"some_string"'
+          binary_parameter: <<"some_binary">>
     UploadBody:
       type: string
       format: binary
