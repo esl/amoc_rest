@@ -31,4 +31,4 @@ The generated server code for AMOC REST API
 
 ## swagger-ui integration
 * the `dist` version of the swagger-ui is integrated under `/api-docs/` path (e.g. http://localhost:4000/api-docs/)
-* the online version of the documentation is also available [here](https://esl.github.io/amoc_rest/?v=7890862) (w/o possibility of execution)
+* the online version of the documentation is also available [here](https://esl.github.io/amoc_rest/) (w/o possibility of execution)
