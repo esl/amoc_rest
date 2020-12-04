@@ -1,4 +1,4 @@
-# amoc_rest [![Build Status](https://travis-ci.org/esl/amoc_rest.svg?branch=master)](https://travis-ci.org/esl/amoc_rest)
+# amoc_rest [![](https://github.com/esl/amoc_rest/workflows/CI/badge.svg)](https://github.com/esl/amoc_rest/actions?query=workflow%3ACI)
 
 The generated server code for AMOC REST API
 
