@@ -11,9 +11,8 @@
         jesse,
         cowboy
     ]},
-    {env, [
-    ]},
+    {env, []},
     {modules, []},
-    {licenses, []},
-    {links, []}
+    {licenses, ["Apache 2.0"]},
+    {links, [{"GitHub", "https://github.com/esl/amoc_rest/"}]}
 ]}.
