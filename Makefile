@@ -1,10 +1,5 @@
 .PHONY: all test generate validate compile console dialyzer xref
 
-REBARVER = 3.13.2
-ifeq ($(OTPVER),24.0)
-	REBARVER = 3.15.1
-endif
-
 OutputDir ?= tmp
 
 define openapi-generator
@@ -25,18 +20,14 @@ generate:
 validate:
 	$(openapi-generator) validate -i openapi.yaml
 
-compile: rebar3
-	./rebar3 compile
+compile:
+	rebar3 compile
 
-console: rebar3
-	./rebar3 shell --apps=amoc_rest
+console:
+	rebar3 shell --apps=amoc_rest
 
-rebar3:
-	wget https://github.com/erlang/rebar3/releases/download/${REBARVER}/rebar3 &&\
-	chmod u+x rebar3
+dialyzer:
+	rebar3 dialyzer
 
-dialyzer: rebar3
-	./rebar3 dialyzer
-
-xref: rebar3
-	./rebar3 xref
+xref:
+	rebar3 xref
