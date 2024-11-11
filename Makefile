@@ -4,7 +4,7 @@ OutputDir ?= tmp
 
 define openapi-generator
   docker run --rm -v "${PWD}:/local" -w "/local" \
-             openapitools/openapi-generator-cli:v4.3.1
+             openapitools/openapi-generator-cli:v7.9.0
 endef
 
 all: compile
