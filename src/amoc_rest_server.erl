@@ -1,25 +1,24 @@
 -module(amoc_rest_server).
+-moduledoc """
+AMOC REST API 
+""".
 
-
--define(DEFAULT_LOGIC_HANDLER, amoc_rest_default_logic_handler).
+-define(DEFAULT_LOGIC_HANDLER, amoc_rest_logic_handler).
 
 -export([start/2]).
+-ignore_xref([start/2]).
 
--spec start( ID :: any(), #{
-    ip            => inet:ip_address(),
-    port          => inet:port_number(),
-    logic_handler => module(),
-    net_opts      => []
-}) -> {ok, pid()} | {error, any()}.
-
-start(ID, #{
-    ip            := IP ,
-    port          := Port,
-    net_opts      := NetOpts
-} = Params) ->
-    {Transport, TransportOpts} = get_socket_transport(IP, Port, NetOpts),
+-spec start(term(), #{transport      => tcp | ssl,
+                      transport_opts => ranch:opts(),
+                      protocol_opts  => cowboy:opts(),
+                      logic_handler  => module()}) ->
+    {ok, pid()} | {error, any()}.
+start(ID, Params) ->
+    Transport = maps:get(transport, Params, tcp),
+    TransportOpts = maps:get(transport_opts, Params, #{}),
+    ProtocolOpts = maps:get(procotol_opts, Params, #{}),
     LogicHandler = maps:get(logic_handler, Params, ?DEFAULT_LOGIC_HANDLER),
-    CowboyOpts = get_default_opts(LogicHandler),
+    CowboyOpts = get_cowboy_config(LogicHandler, ProtocolOpts),
     case Transport of
         ssl ->
             cowboy:start_tls(ID, TransportOpts, CowboyOpts);
@@ -27,25 +26,20 @@ start(ID, #{
             cowboy:start_clear(ID, TransportOpts, CowboyOpts)
     end.
 
-get_socket_transport(IP, Port, Options) ->
-    Opts = [
-        {ip,   IP},
-        {port, Port}
-    ],
-    case amoc_rest_utils:get_opt(ssl, Options) of
-        SslOpts = [_|_] ->
-            {ssl, Opts ++ SslOpts};
-        undefined ->
-            {tcp, Opts}
-    end.
+get_cowboy_config(LogicHandler, ExtraOpts) ->
+    DefaultOpts = get_default_opts(LogicHandler),
+    maps:fold(fun get_cowboy_config/3, DefaultOpts, ExtraOpts).
+
+get_cowboy_config(env, #{dispatch := _Dispatch} = Env, AccIn) ->
+    maps:put(env, Env, AccIn);
+get_cowboy_config(env, NewEnv, #{env := OldEnv} = AccIn) ->
+    Env = maps:merge(OldEnv, NewEnv),
+    maps:put(env, Env, AccIn);
+get_cowboy_config(Key, Value, AccIn) ->
+    maps:put(Key, Value, AccIn).
 
 get_default_dispatch(LogicHandler) ->
-    [{'_', DefaultPaths}] = amoc_rest_router:get_paths(LogicHandler),
-    Paths = [{'_', [ %% adding static routing for swagger-ui
-        {"/api-docs", cowboy_static, {priv_file, amoc_rest, "swagger_ui/index.html"}},
-        {"/api-docs/[...]", cowboy_static, {priv_dir, amoc_rest, "swagger_ui"}},
-        {"/openapi.json", cowboy_static, {priv_file, amoc_rest, "openapi.json"}} |
-        DefaultPaths]}],
+    Paths = amoc_rest_router:get_paths(LogicHandler),
     #{dispatch => cowboy_router:compile(Paths)}.
 
 get_default_opts(LogicHandler) ->

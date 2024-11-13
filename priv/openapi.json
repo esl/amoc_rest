@@ -1,8 +1,9 @@
 {
   "openapi" : "3.0.1",
   "info" : {
-    "title" : "API-DOCS",
-    "version" : "1.0.0"
+    "description" : "AMOC REST API\n",
+    "title" : "AMOC API",
+    "version" : "1.0.1"
   },
   "servers" : [ {
     "url" : "/"
@@ -10,7 +11,7 @@
   "paths" : {
     "/nodes" : {
       "get" : {
-        "description" : "List all AMOC nodes in a cluster.",
+        "operationId" : "getClusteredNodes",
         "responses" : {
           "200" : {
             "content" : {
@@ -23,12 +24,13 @@
             "description" : "response object"
           }
         },
+        "summary" : "List all AMOC nodes in a cluster.",
         "tags" : [ "status" ]
       }
     },
     "/scenarios" : {
       "get" : {
-        "description" : "List all available scenarios",
+        "operationId" : "getAvailableScenarios",
         "responses" : {
           "200" : {
             "content" : {
@@ -41,12 +43,13 @@
             "description" : "response object"
           }
         },
+        "summary" : "List all available scenarios",
         "tags" : [ "scenarios" ]
       }
     },
     "/scenarios/info/{id}" : {
       "get" : {
-        "description" : "Get scenario description",
+        "operationId" : "getScenarioDescription",
         "parameters" : [ {
           "description" : "Scenario name",
           "explode" : false,
@@ -73,12 +76,13 @@
             "description" : "no scenario with such a name"
           }
         },
+        "summary" : "Get scenario description",
         "tags" : [ "scenarios" ]
       }
     },
     "/scenarios/defaults/{id}" : {
       "get" : {
-        "description" : "Get scenario default settings",
+        "operationId" : "getScenarioSettings",
         "parameters" : [ {
           "description" : "Scenario name",
           "explode" : false,
@@ -105,12 +109,13 @@
             "description" : "no scenario with such a name"
           }
         },
+        "summary" : "Get scenario default settings",
         "tags" : [ "scenarios" ]
       }
     },
     "/status" : {
       "get" : {
-        "description" : "Get AMOC app status",
+        "operationId" : "getAmocAppStatus",
         "responses" : {
           "200" : {
             "content" : {
@@ -123,12 +128,13 @@
             "description" : "response object"
           }
         },
+        "summary" : "Get AMOC app status",
         "tags" : [ "status" ]
       }
     },
     "/status/{node}" : {
       "get" : {
-        "description" : "Get AMOC app status on a remote node",
+        "operationId" : "getAmocAppStatusOnNode",
         "parameters" : [ {
           "description" : "Node name",
           "explode" : false,
@@ -155,12 +161,14 @@
             "description" : "no node with such a name"
           }
         },
+        "summary" : "Get AMOC app status on a remote node",
         "tags" : [ "status" ]
       }
     },
     "/scenarios/upload" : {
       "put" : {
         "description" : "Uploads new scenario, you can run the next command to upload a file using curl utility\n\n`curl -s -H \"Content-Type: text/plain\" -T <filename> http://<amoc_host>/upload`",
+        "operationId" : "uploadNewScenario",
         "requestBody" : {
           "content" : {
             "application/octet-stream" : {
@@ -198,12 +206,13 @@
             "description" : "response object"
           }
         },
+        "summary" : "Upload a new scenario.",
         "tags" : [ "scenarios" ]
       }
     },
     "/execution/start" : {
       "patch" : {
-        "description" : "Start scenario",
+        "operationId" : "startScenario",
         "requestBody" : {
           "content" : {
             "application/json" : {
@@ -233,12 +242,19 @@
             "description" : "internal error occurred"
           }
         },
+        "summary" : "Start scenario",
         "tags" : [ "execution" ]
       }
     },
     "/execution/stop" : {
       "patch" : {
-        "description" : "Stop scenario",
+        "operationId" : "stopScenario",
+        "requestBody" : {
+          "content" : {
+            "application/json" : { }
+          },
+          "description" : "request body (as json)"
+        },
         "responses" : {
           "200" : {
             "description" : "execution stopped successfully"
@@ -257,12 +273,13 @@
             "description" : "internal error occurred"
           }
         },
+        "summary" : "Stop scenario",
         "tags" : [ "execution" ]
       }
     },
     "/execution/add_users" : {
       "patch" : {
-        "description" : "add new users",
+        "operationId" : "addUsers",
         "requestBody" : {
           "content" : {
             "application/json" : {
@@ -292,12 +309,13 @@
             "description" : "internal error occurred"
           }
         },
+        "summary" : "add new users",
         "tags" : [ "execution" ]
       }
     },
     "/execution/remove_users" : {
       "patch" : {
-        "description" : "stop users",
+        "operationId" : "removeUsers",
         "requestBody" : {
           "content" : {
             "application/json" : {
@@ -327,12 +345,13 @@
             "description" : "internal error occurred"
           }
         },
+        "summary" : "stop users",
         "tags" : [ "execution" ]
       }
     },
     "/execution/update_settings" : {
       "patch" : {
-        "description" : "update scenario settings",
+        "operationId" : "updateSettings",
         "requestBody" : {
           "content" : {
             "application/json" : {
@@ -362,6 +381,7 @@
             "description" : "internal error occurred"
           }
         },
+        "summary" : "update scenario settings",
         "tags" : [ "execution" ]
       }
     }
@@ -434,7 +454,7 @@
           },
           "parameters" : {
             "additionalProperties" : {
-              "$ref" : "#/components/schemas/ScenarioInfo_parameters"
+              "$ref" : "#/components/schemas/ScenarioInfo_parameters_value"
             },
             "example" : {
               "configuration_parameter_name1" : {
@@ -608,6 +628,9 @@
         "type" : "object"
       },
       "Error" : {
+        "example" : {
+          "error" : "error description"
+        },
         "properties" : {
           "error" : {
             "example" : "error description",
@@ -728,7 +751,7 @@
         "pattern" : "^[^@]+@[^@]+$",
         "type" : "string"
       },
-      "ScenarioInfo_parameters" : {
+      "ScenarioInfo_parameters_value" : {
         "properties" : {
           "module" : {
             "type" : "string"
@@ -746,7 +769,8 @@
             "type" : "string"
           }
         },
-        "required" : [ "default_value", "description", "module", "update_fn", "verification_fn" ]
+        "required" : [ "default_value", "description", "module", "update_fn", "verification_fn" ],
+        "type" : "object"
       }
     }
   }
