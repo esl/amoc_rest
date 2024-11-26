@@ -1,232 +1,143 @@
-%% basic handler
 -module(amoc_rest_status_handler).
+-moduledoc """
+Exposes the following operation IDs:
+
+- `GET` to `/status`, OperationId: `getAmocAppStatus`:
+Get AMOC app status.
+
+
+- `GET` to `/status/:node`, OperationId: `getAmocAppStatusOnNode`:
+Get AMOC app status on a remote node.
+
+
+- `GET` to `/nodes`, OperationId: `getClusteredNodes`:
+List all AMOC nodes in a cluster..
+
+
+""".
+
+-behaviour(cowboy_rest).
+
+-include_lib("kernel/include/logger.hrl").
 
 %% Cowboy REST callbacks
--export([allowed_methods/2]).
 -export([init/2]).
--export([allow_missing_post/2]).
+-export([allowed_methods/2]).
 -export([content_types_accepted/2]).
 -export([content_types_provided/2]).
 -export([delete_resource/2]).
 -export([is_authorized/2]).
--export([known_content_type/2]).
--export([malformed_request/2]).
 -export([valid_content_headers/2]).
--export([valid_entity_length/2]).
+-export([handle_type_accepted/2, handle_type_provided/2]).
 
-%% Handlers
--export([handle_request_json/2]).
+-ignore_xref([handle_type_accepted/2, handle_type_provided/2]).
 
--record(state, {
-    operation_id :: amoc_rest_api:operation_id(),
-    logic_handler :: atom(),
-    validator_state :: jesse_state:state(),
-    context=#{} :: #{}
-}).
+-export_type([class/0, operation_id/0]).
 
--type state() :: state().
+-type class() :: 'status'.
 
--spec init(Req :: cowboy_req:req(), Opts :: amoc_rest_router:init_opts()) ->
-    {cowboy_rest, Req :: cowboy_req:req(), State :: state()}.
+-type operation_id() ::
+    'getAmocAppStatus' %% Get AMOC app status
+    | 'getAmocAppStatusOnNode' %% Get AMOC app status on a remote node
+    | 'getClusteredNodes'. %% List all AMOC nodes in a cluster.
 
-init(Req, {Operations, LogicHandler, ValidatorState}) ->
+
+-record(state,
+        {operation_id :: operation_id(),
+         accept_callback :: amoc_rest_logic_handler:accept_callback(),
+         provide_callback :: amoc_rest_logic_handler:provide_callback(),
+         api_key_handler :: amoc_rest_logic_handler:api_key_callback(),
+         context = #{} :: amoc_rest_logic_handler:context()}).
+
+-type state() :: #state{}.
+
+-spec init(cowboy_req:req(), amoc_rest_router:init_opts()) ->
+    {cowboy_rest, cowboy_req:req(), state()}.
+init(Req, {Operations, Module}) ->
     Method = cowboy_req:method(Req),
     OperationID = maps:get(Method, Operations, undefined),
-
-    error_logger:info_msg("Attempt to process operation: ~p", [OperationID]),
-
-    State = #state{
-        operation_id = OperationID,
-        logic_handler = LogicHandler,
-        validator_state = ValidatorState
-    },
+    ?LOG_INFO(#{what => "Attempt to process operation",
+                method => Method,
+                operation_id => OperationID}),
+    State = #state{operation_id = OperationID,
+                   accept_callback = fun Module:accept_callback/4,
+                   provide_callback = fun Module:provide_callback/4,
+                   api_key_handler = fun Module:authorize_api_key/2},
     {cowboy_rest, Req, State}.
 
--spec allowed_methods(Req :: cowboy_req:req(), State :: state()) ->
-    {Value :: [binary()], Req :: cowboy_req:req(), State :: state()}.
-
-
-allowed_methods(
-    Req,
-    State = #state{
-        operation_id = 'NodesGet'
-    }
-) ->
+-spec allowed_methods(cowboy_req:req(), state()) ->
+    {[binary()], cowboy_req:req(), state()}.
+allowed_methods(Req, #state{operation_id = 'getAmocAppStatus'} = State) ->
     {[<<"GET">>], Req, State};
-
-allowed_methods(
-    Req,
-    State = #state{
-        operation_id = 'StatusGet'
-    }
-) ->
+allowed_methods(Req, #state{operation_id = 'getAmocAppStatusOnNode'} = State) ->
     {[<<"GET">>], Req, State};
-
-allowed_methods(
-    Req,
-    State = #state{
-        operation_id = 'StatusNodeGet'
-    }
-) ->
+allowed_methods(Req, #state{operation_id = 'getClusteredNodes'} = State) ->
     {[<<"GET">>], Req, State};
-
 allowed_methods(Req, State) ->
     {[], Req, State}.
 
--spec is_authorized(Req :: cowboy_req:req(), State :: state()) ->
-    {
-        Value :: true | {false, AuthHeader :: iodata()},
-        Req :: cowboy_req:req(),
-        State :: state()
-    }.
+-spec is_authorized(cowboy_req:req(), state()) ->
+    {true | {false, iodata()}, cowboy_req:req(), state()}.
 is_authorized(Req, State) ->
     {true, Req, State}.
 
--spec content_types_accepted(Req :: cowboy_req:req(), State :: state()) ->
-    {
-        Value :: [{binary(), AcceptResource :: atom()}],
-        Req :: cowboy_req:req(),
-        State :: state()
-    }.
-
+-spec content_types_accepted(cowboy_req:req(), state()) ->
+    {[{binary(), atom()}], cowboy_req:req(), state()}.
+content_types_accepted(Req, #state{operation_id = 'getAmocAppStatus'} = State) ->
+    {[], Req, State};
+content_types_accepted(Req, #state{operation_id = 'getAmocAppStatusOnNode'} = State) ->
+    {[], Req, State};
+content_types_accepted(Req, #state{operation_id = 'getClusteredNodes'} = State) ->
+    {[], Req, State};
 content_types_accepted(Req, State) ->
-    {[
-        {<<"application/json">>, handle_request_json}
-    ], Req, State}.
+    {[], Req, State}.
 
--spec valid_content_headers(Req :: cowboy_req:req(), State :: state()) ->
-    {Value :: boolean(), Req :: cowboy_req:req(), State :: state()}.
-
-valid_content_headers(
-    Req0,
-    State = #state{
-        operation_id = 'NodesGet'
-    }
-) ->
-    Headers = [],
-    {Result, Req} = validate_headers(Headers, Req0),
-    {Result, Req, State};
-
-valid_content_headers(
-    Req0,
-    State = #state{
-        operation_id = 'StatusGet'
-    }
-) ->
-    Headers = [],
-    {Result, Req} = validate_headers(Headers, Req0),
-    {Result, Req, State};
-
-valid_content_headers(
-    Req0,
-    State = #state{
-        operation_id = 'StatusNodeGet'
-    }
-) ->
-    Headers = [],
-    {Result, Req} = validate_headers(Headers, Req0),
-    {Result, Req, State};
-
+-spec valid_content_headers(cowboy_req:req(), state()) ->
+    {boolean(), cowboy_req:req(), state()}.
+valid_content_headers(Req, #state{operation_id = 'getAmocAppStatus'} = State) ->
+    {true, Req, State};
+valid_content_headers(Req, #state{operation_id = 'getAmocAppStatusOnNode'} = State) ->
+    {true, Req, State};
+valid_content_headers(Req, #state{operation_id = 'getClusteredNodes'} = State) ->
+    {true, Req, State};
 valid_content_headers(Req, State) ->
     {false, Req, State}.
 
--spec content_types_provided(Req :: cowboy_req:req(), State :: state()) ->
-    {
-        Value :: [{binary(), ProvideResource :: atom()}],
-        Req :: cowboy_req:req(),
-        State :: state()
-    }.
-
-content_types_provided(Req, State) ->
+-spec content_types_provided(cowboy_req:req(), state()) ->
+    {[{binary(), atom()}], cowboy_req:req(), state()}.
+content_types_provided(Req, #state{operation_id = 'getAmocAppStatus'} = State) ->
     {[
-        {<<"application/json">>, handle_request_json}
-    ], Req, State}.
+      {<<"application/json">>, handle_type_provided}
+     ], Req, State};
+content_types_provided(Req, #state{operation_id = 'getAmocAppStatusOnNode'} = State) ->
+    {[
+      {<<"application/json">>, handle_type_provided}
+     ], Req, State};
+content_types_provided(Req, #state{operation_id = 'getClusteredNodes'} = State) ->
+    {[
+      {<<"application/json">>, handle_type_provided}
+     ], Req, State};
+content_types_provided(Req, State) ->
+    {[], Req, State}.
 
--spec malformed_request(Req :: cowboy_req:req(), State :: state()) ->
-    {Value :: false, Req :: cowboy_req:req(), State :: state()}.
-
-malformed_request(Req, State) ->
-    {false, Req, State}.
-
--spec allow_missing_post(Req :: cowboy_req:req(), State :: state()) ->
-    {Value :: false, Req :: cowboy_req:req(), State :: state()}.
-
-allow_missing_post(Req, State) ->
-    {false, Req, State}.
-
--spec delete_resource(Req :: cowboy_req:req(), State :: state()) ->
-    processed_response().
-
+-spec delete_resource(cowboy_req:req(), state()) ->
+    {boolean(), cowboy_req:req(), state()}.
 delete_resource(Req, State) ->
-    handle_request_json(Req, State).
+    {Res, Req1, State1} = handle_type_accepted(Req, State),
+    {true =:= Res, Req1, State1}.
 
--spec known_content_type(Req :: cowboy_req:req(), State :: state()) ->
-    {Value :: true, Req :: cowboy_req:req(), State :: state()}.
+-spec handle_type_accepted(cowboy_req:req(), state()) ->
+    { amoc_rest_logic_handler:accept_callback_return(), cowboy_req:req(), state()}.
+handle_type_accepted(Req, #state{operation_id = OperationID,
+                                 accept_callback = Handler,
+                                 context = Context} = State) ->
+    {Res, Req1, Context1} = Handler(status, OperationID, Req, Context),
+    {Res, Req1, State#state{context = Context1}}.
 
-known_content_type(Req, State) ->
-    {true, Req, State}.
-
--spec valid_entity_length(Req :: cowboy_req:req(), State :: state()) ->
-    {Value :: true, Req :: cowboy_req:req(), State :: state()}.
-
-valid_entity_length(Req, State) ->
-    %% @TODO check the length
-    {true, Req, State}.
-
-%%%%
--type result_ok() :: {
-    ok,
-    {Status :: cowboy:http_status(), Headers :: cowboy:http_headers(), Body :: iodata()}
-}.
-
--type result_error() :: {error, Reason :: any()}.
-
--type processed_response() :: {stop, cowboy_req:req(), state()}.
-
--spec process_response(result_ok() | result_error(), cowboy_req:req(), state()) ->
-    processed_response().
-
-process_response(Response, Req0, State = #state{operation_id = OperationID}) ->
-    case Response of
-        {ok, {Code, Headers, Body}} ->
-            Req = cowboy_req:reply(Code, Headers, Body, Req0),
-            {stop, Req, State};
-        {error, Message} ->
-            error_logger:error_msg("Unable to process request for ~p: ~p", [OperationID, Message]),
-
-            Req = cowboy_req:reply(400, Req0),
-            {stop, Req, State}
-    end.
-
--spec handle_request_json(cowboy_req:req(), state()) -> processed_response().
-
-handle_request_json(
-    Req0,
-    State = #state{
-        operation_id = OperationID,
-        logic_handler = LogicHandler,
-        validator_state = ValidatorState
-    }
-) ->
-    case amoc_rest_api:populate_request(OperationID, Req0, ValidatorState) of
-        {ok, Populated, Req1} ->
-            {Code, Headers, Body} = amoc_rest_logic_handler:handle_request(
-                LogicHandler,
-                OperationID,
-                Req1,
-                maps:merge(State#state.context, Populated)
-            ),
-            _ = amoc_rest_api:validate_response(
-                OperationID,
-                Code,
-                Body,
-                ValidatorState
-            ),
-            PreparedBody = jsx:encode(Body),
-            Response = {ok, {Code, Headers, PreparedBody}},
-            process_response(Response, Req1, State);
-        {error, Reason, Req1} ->
-            process_response({error, Reason}, Req1, State)
-    end.
-
-validate_headers(_, Req) -> {true, Req}.
+-spec handle_type_provided(cowboy_req:req(), state()) ->
+    { amoc_rest_logic_handler:provide_callback_return(), cowboy_req:req(), state()}.
+handle_type_provided(Req, #state{operation_id = OperationID,
+                                 provide_callback = Handler,
+                                 context = Context} = State) ->
+    {Res, Req1, Context1} = Handler(status, OperationID, Req, Context),
+    {Res, Req1, State#state{context = Context1}}.

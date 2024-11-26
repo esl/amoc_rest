@@ -1,15 +1,18 @@
 openapi: 3.0.1
 info:
-  title: API-DOCS
-  version: 1.0.0
+  title: AMOC API
+  version: 1.0.1
+  description: |
+    AMOC REST API
 servers:
   - url: /
 paths:
   /nodes:
     get:
+      operationId: getClusteredNodes
       tags:
         - status
-      description: List all AMOC nodes in a cluster.
+      summary: List all AMOC nodes in a cluster.
       responses:
         '200':
           description: response object
@@ -19,9 +22,10 @@ paths:
                 $ref: '#/components/schemas/NodesKV'
   /scenarios:
     get:
+      operationId: getAvailableScenarios
       tags:
         - scenarios
-      description: List all available scenarios
+      summary: List all available scenarios
       responses:
         '200':
           description: response object
@@ -31,9 +35,10 @@ paths:
                 $ref: '#/components/schemas/ScenarioList'
   '/scenarios/info/{id}':
     get:
+      operationId: getScenarioDescription
       tags:
         - scenarios
-      description: Get scenario description
+      summary: Get scenario description
       parameters:
         - name: id
           in: path
@@ -52,9 +57,10 @@ paths:
           description: no scenario with such a name
   '/scenarios/defaults/{id}':
     get:
+      operationId: getScenarioSettings
       tags:
         - scenarios
-      description: Get scenario default settings
+      summary: Get scenario default settings
       parameters:
         - name: id
           in: path
@@ -73,9 +79,10 @@ paths:
           description: no scenario with such a name
   /status:
     get:
+      operationId: getAmocAppStatus
       tags:
         - status
-      description: Get AMOC app status
+      summary: Get AMOC app status
       responses:
         '200':
           description: response object
@@ -85,9 +92,10 @@ paths:
                 $ref: '#/components/schemas/AmocStatus'
   '/status/{node}':
     get:
+      operationId: getAmocAppStatusOnNode
       tags:
         - status
-      description: Get AMOC app status on a remote node
+      summary: Get AMOC app status on a remote node
       parameters:
         - name: node
           in: path
@@ -106,8 +114,10 @@ paths:
           description: no node with such a name
   /scenarios/upload:
     put:
+      operationId: uploadNewScenario
       tags:
         - scenarios
+      summary: Upload a new scenario.
       description: >-
         Uploads new scenario, you can run the next command to upload a file
         using curl utility
@@ -139,9 +149,10 @@ paths:
                 $ref: '#/components/schemas/Error'
   /execution/start:
     patch:
+      operationId: startScenario
       tags:
         - execution
-      description: Start scenario
+      summary: Start scenario
       requestBody:
         description: request body (as json)
         content:
@@ -164,9 +175,14 @@ paths:
                 $ref: '#/components/schemas/Error'
   /execution/stop:
     patch:
+      operationId: stopScenario
       tags:
         - execution
-      description: Stop scenario
+      summary: Stop scenario
+      requestBody:
+        description: request body (as json)
+        content:
+          application/json: {}
       responses:
         '200':
           description: execution stopped successfully
@@ -180,9 +196,10 @@ paths:
                 $ref: '#/components/schemas/Error'
   /execution/add_users:
     patch:
+      operationId: addUsers
       tags:
         - execution
-      description: add new users
+      summary: add new users
       requestBody:
         description: request body (as json)
         content:
@@ -203,9 +220,10 @@ paths:
                 $ref: '#/components/schemas/Error'
   /execution/remove_users:
     patch:
+      operationId: removeUsers
       tags:
         - execution
-      description: stop users
+      summary: stop users
       requestBody:
         description: request body (as json)
         content:
@@ -226,9 +244,10 @@ paths:
                 $ref: '#/components/schemas/Error'
   /execution/update_settings:
     patch:
+      operationId: updateSettings
       tags:
         - execution
-      description: update scenario settings
+      summary: update scenario settings
       requestBody:
         description: request body (as json)
         content:

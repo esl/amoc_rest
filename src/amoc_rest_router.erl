@@ -2,128 +2,133 @@
 
 -export([get_paths/1]).
 
--type operations() :: #{
-    Method :: binary() => amoc_rest_api:operation_id()
-}.
-
--type init_opts()  :: {
-    Operations :: operations(),
-    LogicHandler :: atom(),
-    ValidatorState :: jesse_state:state()
-}.
+-type method() :: binary().
+-type operations() :: #{method() => amoc_rest_api:operation_id()}.
+-type init_opts()  :: {operations(), module()}.
 
 -export_type([init_opts/0]).
 
--spec get_paths(LogicHandler :: atom()) ->  [{'_',[{
-    Path :: string(),
-    Handler :: atom(),
-    InitOpts :: init_opts()
-}]}].
-
+-spec get_paths(LogicHandler :: module()) -> cowboy_router:routes().
 get_paths(LogicHandler) ->
-    ValidatorState = prepare_validator(),
     PreparedPaths = maps:fold(
-        fun(Path, #{operations := Operations, handler := Handler}, Acc) ->
-            [{Path, Handler, Operations} | Acc]
-        end,
-        [],
-        group_paths()
-    ),
-    [
-        {'_',
-            [{P, H, {O, LogicHandler, ValidatorState}} || {P, H, O} <- PreparedPaths]
-        }
-    ].
+                      fun(Path, #{operations := Operations, handler := Handler}, Acc) ->
+                              [{Path, Handler, Operations} | Acc]
+                      end, [], group_paths()
+                     ),
+    [{'_', [{P, H, {O, LogicHandler}} || {P, H, O} <- PreparedPaths]}].
 
 group_paths() ->
     maps:fold(
-        fun(OperationID, #{path := Path, method := Method, handler := Handler}, Acc) ->
-            case maps:find(Path, Acc) of
-                {ok, PathInfo0 = #{operations := Operations0}} ->
-                    Operations = Operations0#{Method => OperationID},
-                    PathInfo = PathInfo0#{operations => Operations},
-                    Acc#{Path => PathInfo};
-                error ->
-                    Operations = #{Method => OperationID},
-                    PathInfo = #{handler => Handler, operations => Operations},
-                    Acc#{Path => PathInfo}
-            end
-        end,
-        #{},
-        get_operations()
-    ).
+      fun(OperationID, #{servers := Servers, base_path := BasePath, path := Path,
+                         method := Method, handler := Handler}, Acc) ->
+              FullPaths = build_full_paths(Servers, BasePath, Path),
+              merge_paths(FullPaths, OperationID, Method, Handler, Acc)
+      end, #{}, get_operations()).
+
+build_full_paths([], BasePath, Path) ->
+    [lists:append([BasePath, Path])];
+build_full_paths(Servers, _BasePath, Path) ->
+    [lists:append([Server, Path]) || Server <- Servers ].
+
+merge_paths(FullPaths, OperationID, Method, Handler, Acc) ->
+    lists:foldl(
+      fun(Path, Acc0) ->
+              case maps:find(Path, Acc0) of
+                  {ok, PathInfo0 = #{operations := Operations0}} ->
+                      Operations = Operations0#{Method => OperationID},
+                      PathInfo = PathInfo0#{operations => Operations},
+                      Acc0#{Path => PathInfo};
+                  error ->
+                      Operations = #{Method => OperationID},
+                      PathInfo = #{handler => Handler, operations => Operations},
+                      Acc0#{Path => PathInfo}
+              end
+      end, Acc, FullPaths).
 
 get_operations() ->
     #{ 
-        'ExecutionAddUsersPatch' => #{
+       'addUsers' => #{
+            servers => [],
+            base_path => "",
             path => "/execution/add_users",
             method => <<"PATCH">>,
             handler => 'amoc_rest_execution_handler'
         },
-        'ExecutionRemoveUsersPatch' => #{
+       'removeUsers' => #{
+            servers => [],
+            base_path => "",
             path => "/execution/remove_users",
             method => <<"PATCH">>,
             handler => 'amoc_rest_execution_handler'
         },
-        'ExecutionStartPatch' => #{
+       'startScenario' => #{
+            servers => [],
+            base_path => "",
             path => "/execution/start",
             method => <<"PATCH">>,
             handler => 'amoc_rest_execution_handler'
         },
-        'ExecutionStopPatch' => #{
+       'stopScenario' => #{
+            servers => [],
+            base_path => "",
             path => "/execution/stop",
             method => <<"PATCH">>,
             handler => 'amoc_rest_execution_handler'
         },
-        'ExecutionUpdateSettingsPatch' => #{
+       'updateSettings' => #{
+            servers => [],
+            base_path => "",
             path => "/execution/update_settings",
             method => <<"PATCH">>,
             handler => 'amoc_rest_execution_handler'
         },
-        'ScenariosDefaultsIdGet' => #{
-            path => "/scenarios/defaults/:id",
-            method => <<"GET">>,
-            handler => 'amoc_rest_scenarios_handler'
-        },
-        'ScenariosGet' => #{
+       'getAvailableScenarios' => #{
+            servers => [],
+            base_path => "",
             path => "/scenarios",
             method => <<"GET">>,
             handler => 'amoc_rest_scenarios_handler'
         },
-        'ScenariosInfoIdGet' => #{
+       'getScenarioDescription' => #{
+            servers => [],
+            base_path => "",
             path => "/scenarios/info/:id",
             method => <<"GET">>,
             handler => 'amoc_rest_scenarios_handler'
         },
-        'ScenariosUploadPut' => #{
+       'getScenarioSettings' => #{
+            servers => [],
+            base_path => "",
+            path => "/scenarios/defaults/:id",
+            method => <<"GET">>,
+            handler => 'amoc_rest_scenarios_handler'
+        },
+       'uploadNewScenario' => #{
+            servers => [],
+            base_path => "",
             path => "/scenarios/upload",
             method => <<"PUT">>,
             handler => 'amoc_rest_scenarios_handler'
         },
-        'NodesGet' => #{
-            path => "/nodes",
-            method => <<"GET">>,
-            handler => 'amoc_rest_status_handler'
-        },
-        'StatusGet' => #{
+       'getAmocAppStatus' => #{
+            servers => [],
+            base_path => "",
             path => "/status",
             method => <<"GET">>,
             handler => 'amoc_rest_status_handler'
         },
-        'StatusNodeGet' => #{
+       'getAmocAppStatusOnNode' => #{
+            servers => [],
+            base_path => "",
             path => "/status/:node",
+            method => <<"GET">>,
+            handler => 'amoc_rest_status_handler'
+        },
+       'getClusteredNodes' => #{
+            servers => [],
+            base_path => "",
+            path => "/nodes",
             method => <<"GET">>,
             handler => 'amoc_rest_status_handler'
         }
     }.
-
-prepare_validator() ->
-    R = jsx:decode(element(2, file:read_file(get_openapi_path()))),
-    jesse_state:new(R, [{default_schema_ver, <<"http://json-schema.org/draft-04/schema#">>}]).
-
-
-get_openapi_path() ->
-    {ok, AppName} = application:get_application(?MODULE),
-    filename:join(amoc_rest_utils:priv_dir(AppName), "openapi.json").
-
-
