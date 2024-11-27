@@ -25,8 +25,19 @@ The generated server code for AMOC REST API
   and then, execute in the erlang shell:
 
   ```erlang
-  ServerParams = #{ip => {0, 0, 0, 0}, port => 4000, net_opts => []}.
-  amoc_rest_server:start(http_server, ServerParams).
+    ModuleHandler = openapi_callbacks, %% Module implementing the callbacks behaviour
+    TransportOpts = #{socket_opts => [{ip, {0, 0, 0, 0}}, {port, Port}]},
+    ProtocolOpts = #{metrics_callback => fun prometheus_cowboy2_instrumenter:observe/1,
+                     stream_handlers => [cowboy_metrics_h]},
+    amoc_rest_server:start(
+        openapi_http_server,
+        #{
+            transport => tcp,
+            transport_opts => TransportOpts,
+            protocol_opts => ProtocolOpts,
+            logic_handler => ModuleHandler
+        }
+    ).
   ```
 
 ## swagger-ui integration
